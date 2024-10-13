@@ -11,7 +11,7 @@ namespace Models
         public string FieldName { get; set; } = String.Empty;
         public string FieldImageUrl { get; set; } = String.Empty;
         public string FieldDescription { get; set; } = String.Empty;
-        public bool IsEnabled { get; set; }
+        public bool IsEnabled { get; set; } = true;
         public DateTime CreatedDateTime { get; set; } = DateTime.Now;
         public DateTime UpdatedDateTime { get; set; } = DateTime.Now;
 
