@@ -108,6 +108,11 @@ namespace api.repository
             }
         }
 
+        public async Task<bool> IsFieldExist(int id)
+        {
+            return await _context.Fields.AnyAsync(i => i.FieldId == id);
+        }
+
         public async Task<Field?> UpdateFieldAsync(int id, UpdateFieldDto fieldDto)
         {
             var fieldModel = await _context.Fields.FindAsync(id);

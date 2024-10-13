@@ -15,6 +15,6 @@ namespace Interfaces
         Task<Field> CreateFieldAsync(Field fieldModel);
         Task<Field?> UpdateFieldAsync(int id, UpdateFieldDto fieldDto);
         Task<Field?> DeleteFieldAsync(int id);
-        //Task<Field?> FindFieldByNameAsync(String fieldName);
+        Task<bool> IsFieldExist(int id);
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Interfaces;
+using api.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,7 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
 //add identtity
 // Repository
 builder.Services.AddScoped<IFieldRepository, FieldRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
 // Exception Handlers
 builder.Services.AddSingleton<GlobalExceptionHandler>();

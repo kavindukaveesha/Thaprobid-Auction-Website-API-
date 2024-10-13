@@ -14,11 +14,12 @@ using Microsoft.Extensions.Logging;
 namespace api.Controller.Client
 {
     [Route("api/admin/manage-fields")]
-    public class FManageFieldController : ControllerBase
+    [ApiController]
+    public class ManageFieldController : ControllerBase
     {
         private readonly IFieldRepository _fieldRepo;
 
-        public FManageFieldController(IFieldRepository fieldRepo)
+        public ManageFieldController(IFieldRepository fieldRepo)
         {
             _fieldRepo = fieldRepo;
         }
