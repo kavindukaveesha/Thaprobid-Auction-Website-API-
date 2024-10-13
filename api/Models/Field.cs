@@ -7,11 +7,15 @@ namespace Models
 {
     public class Field
     {
-        public int fieldId { get; set; }
-        public string fieldName { get; set; }
-        public string fieldImageUrl { get; set; }
-        public string fieldDescription { get; set; }
-        public bool isEnabled { get; set; }
+        public int FieldId { get; set; }
+        public string FieldName { get; set; } = String.Empty;
+        public string FieldImageUrl { get; set; } = String.Empty;
+        public string FieldDescription { get; set; } = String.Empty;
+        public bool IsEnabled { get; set; }
+        public DateTime CreatedDateTime { get; set; } = DateTime.Now;
+        public DateTime UpdatedDateTime { get; set; } = DateTime.Now;
+
+
         //  public List<Category> categoriesList{get;set;} = new List<Category>();
 
     }
