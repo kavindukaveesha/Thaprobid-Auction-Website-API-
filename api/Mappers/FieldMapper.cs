@@ -17,7 +17,9 @@ namespace api.Mappers
                 FieldName = fieldModel.FieldName,
                 FieldImageUrl = fieldModel.FieldImageUrl,
                 FieldDescription = fieldModel.FieldDescription,
-                IsEnabled = fieldModel.IsEnabled
+                IsEnabled = fieldModel.IsEnabled,
+                Categories = fieldModel.Categories.Select(c => c.ToCategorydDto()).ToList()
+
             };
         }
 

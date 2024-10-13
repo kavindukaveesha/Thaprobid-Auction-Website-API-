@@ -14,7 +14,7 @@ namespace api.Models
         public bool IsEnabled { get; set; } = true;
         public DateTime CreatedDateTime { get; set; } = DateTime.Now;
         public DateTime UpdatedDateTime { get; set; } = DateTime.Now;
-        public int? fieldId { get; set; }
+        public int? FieldId { get; set; }
 
     }
 }

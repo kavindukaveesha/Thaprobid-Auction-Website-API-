@@ -12,5 +12,6 @@ namespace api.Dto.Field
         public string FieldName { get; set; } = String.Empty;
         public string FieldImageUrl { get; set; } = String.Empty;
         public string FieldDescription { get; set; } = String.Empty;
+
     }
 }

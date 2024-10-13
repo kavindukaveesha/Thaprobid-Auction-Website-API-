@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using api.Models;
 
 namespace api.Dto.Field
 {
@@ -14,5 +15,6 @@ namespace api.Dto.Field
         public bool IsEnabled { get; set; } = true;
         public DateTime CreatedDateTime { get; set; } = DateTime.Now;
         public DateTime UpdatedDateTime { get; set; } = DateTime.Now;
+        public List<CategoryDto> Categories { get; set; }
     }
 }

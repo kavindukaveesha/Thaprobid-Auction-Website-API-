@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api.data;
 
@@ -11,9 +12,11 @@ using api.data;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241013181720_updategategoryupdatedb")]
+    partial class updategategoryupdatedb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -79,18 +82,18 @@ namespace api.Migrations
                     b.Property<DateTime>("CreatedDateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("FieldId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsEnabled")
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("UpdatedDateTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("fieldId")
+                        .HasColumnType("int");
+
                     b.HasKey("CategoryId");
 
-                    b.HasIndex("FieldId");
+                    b.HasIndex("fieldId");
 
                     b.ToTable("Categories");
                 });
@@ -99,7 +102,7 @@ namespace api.Migrations
                 {
                     b.HasOne("Models.Field", null)
                         .WithMany("Categories")
-                        .HasForeignKey("FieldId");
+                        .HasForeignKey("fieldId");
                 });
 
             modelBuilder.Entity("Models.Field", b =>

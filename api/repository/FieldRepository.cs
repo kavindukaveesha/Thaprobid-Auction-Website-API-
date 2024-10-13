@@ -62,35 +62,31 @@ namespace api.repository
 
         public async Task<List<Field>> GetAllFieldsAsync(FieldQueryObject queryObject)
         {
-            return _context.Fields.ToList();
-            // try
-            // {
-            //     var fields = _context.Fields.Include(c => c.Comments).AsQueryable();
-            //     if (!String.IsNullOrWhiteSpace(queryObject.FieldName))
-            //     {
-            //         fields = fields.Where(s => s.FieldName.Contains(queryObject.FieldName));
-            //     }
-            //     if (!String.IsNullOrWhiteSpace(queryObject.FieldDescription))
-            //     {
-            //         fields = fields.Where(s => s.FieldDescription.Contains(queryObject.FieldDescription));
-            //     }
 
-            //     if (!string.IsNullOrWhiteSpace(queryObject.SortBy))
-            //     {
-            //         if (queryObject.SortBy.Equals("FieldName", StringComparison.OrdinalIgnoreCase))
-            //         {
-            //             fields = queryObject.IsDecsending ? fields.OrderByDescending(s => s.FieldName) : fields.OrderBy(s => s.FieldName);
-            //         }
-            //     }
+            try
+            {
+                var fields = _context.Fields.Include(c => c.Categories).AsQueryable();
+                if (!String.IsNullOrWhiteSpace(queryObject.FieldName))
+                {
+                    fields = fields.Where(s => s.FieldName.Contains(queryObject.FieldName));
+                }
 
-            //     var skipNumber = (queryObject.PageNumber - 1) * queryObject.PageSize;
+                if (!string.IsNullOrWhiteSpace(queryObject.SortBy))
+                {
+                    if (queryObject.SortBy.Equals("FieldName", StringComparison.OrdinalIgnoreCase))
+                    {
+                        fields = queryObject.IsDecsending ? fields.OrderByDescending(s => s.FieldName) : fields.OrderBy(s => s.FieldName);
+                    }
+                }
 
-            //     return await fields.Skip(skipNumber).Take(queryObject.PageSize).ToListAsync();
-            // }
-            // catch (Exception ex)
-            // {
-            //     throw new BadRequestException("An error occurred while retrieving fields. Please try again later.", ex);
-            // }
+                var skipNumber = (queryObject.PageNumber - 1) * queryObject.PageSize;
+
+                return await fields.Skip(skipNumber).Take(queryObject.PageSize).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException("An error occurred while retrieving fields. Please try again later.", ex);
+            }
         }
 
 
@@ -100,7 +96,7 @@ namespace api.repository
             try
             {
                 //return await _context.Fields.Include(c => c.Comments).FirstOrDefaultAsync(i => i.Id == id);
-                return await _context.Fields.FindAsync(id);
+                return await _context.Fields.Include(c => c.Categories).FirstOrDefaultAsync(i => i.FieldId == id);
             }
             catch (Exception ex)
             {
@@ -126,6 +122,7 @@ namespace api.repository
                 fieldModel.FieldName = fieldDto.FieldName;
                 fieldModel.FieldImageUrl = fieldDto.FieldImageUrl;
                 fieldModel.FieldDescription = fieldDto.FieldDescription;
+                fieldModel.UpdatedDateTime = DateTime.Now;
 
                 await _context.SaveChangesAsync();
                 return fieldModel;

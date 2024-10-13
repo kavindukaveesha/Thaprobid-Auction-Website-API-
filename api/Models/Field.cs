@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using api.Models;
 
 namespace Models
 {
@@ -15,8 +16,7 @@ namespace Models
         public DateTime CreatedDateTime { get; set; } = DateTime.Now;
         public DateTime UpdatedDateTime { get; set; } = DateTime.Now;
 
-
-        //  public List<Category> categoriesList{get;set;} = new List<Category>();
+        public List<Category> Categories { get; set; } = new List<Category>();
 
     }
 }

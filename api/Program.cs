@@ -23,6 +23,12 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 //add identtity
+
+//newtonjson for connections
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+{
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+});
 // Repository
 builder.Services.AddScoped<IFieldRepository, FieldRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();

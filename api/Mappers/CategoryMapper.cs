@@ -17,7 +17,9 @@ namespace api.Mappers
                 CategoryName = categoryModel.CategoryName,
                 CategoryImageUrl = categoryModel.CategoryImageUrl,
                 CategoryDescription = categoryModel.CategoryDescription,
-                IsEnabled = categoryModel.IsEnabled
+                IsEnabled = categoryModel.IsEnabled,
+                FieldId = categoryModel.FieldId
+
             };
         }
 
@@ -28,7 +30,7 @@ namespace api.Mappers
                 CategoryName = categoryDto.CategorydName,
                 CategoryImageUrl = categoryDto.CategorydImageUrl,
                 CategoryDescription = categoryDto.CategorydDescription,
-                fieldId = FieldId
+                FieldId = FieldId
             };
         }
         public static Category ToCategoryFromUpdate(this CreateCategoryDto categoryDto)
