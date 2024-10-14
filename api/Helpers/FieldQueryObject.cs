@@ -8,5 +8,9 @@ namespace api.Helpers
     public class FieldQueryObject
     {
         public String? FieldName { get; set; } = null;
+        public String? SortBy { get; set; } = null;
+        public bool IsDecsending { get; set; } = false;
+        public int PageNumber { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
     }
 }

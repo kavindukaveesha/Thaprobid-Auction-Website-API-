@@ -136,3 +136,7 @@ D:\SOFTWERE ENGENEERING\My-Projects\C#_Projects\Thaprobid-Auction-Website-API-\a
 D:\SOFTWERE ENGENEERING\My-Projects\C#_Projects\Thaprobid-Auction-Website-API-\api\obj\Debug\net8.0\api.pdb
 D:\SOFTWERE ENGENEERING\My-Projects\C#_Projects\Thaprobid-Auction-Website-API-\api\obj\Debug\net8.0\api.genruntimeconfig.cache
 D:\SOFTWERE ENGENEERING\My-Projects\C#_Projects\Thaprobid-Auction-Website-API-\api\obj\Debug\net8.0\ref\api.dll
+D:\SOFTWERE ENGENEERING\My-Projects\C#_Projects\Thaprobid-Auction-Website-API-\api\bin\Debug\net8.0\Microsoft.AspNetCore.JsonPatch.dll
+D:\SOFTWERE ENGENEERING\My-Projects\C#_Projects\Thaprobid-Auction-Website-API-\api\bin\Debug\net8.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
+D:\SOFTWERE ENGENEERING\My-Projects\C#_Projects\Thaprobid-Auction-Website-API-\api\bin\Debug\net8.0\Newtonsoft.Json.dll
+D:\SOFTWERE ENGENEERING\My-Projects\C#_Projects\Thaprobid-Auction-Website-API-\api\bin\Debug\net8.0\Newtonsoft.Json.Bson.dll

@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace api.Controller.Admin
 {
     [ApiController]
-    [Route("api/admin/field")]
-    public class FieldController
+    [Route("api/admin/manage-auction")]
+    public class ManageAuctionController : ControllerBase
     {
 
     }
