@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using api.Dto.Field;
+using api.Models;
 using Models;
 
 namespace api.Mappers
@@ -20,8 +21,10 @@ namespace api.Mappers
                 IsEnabled = fieldModel.IsEnabled,
                 Categories = fieldModel.Categories.Select(c => c.ToCategorydDto()).ToList()
 
+
             };
         }
+
 
         public static Field ToFieldFromFieldDto(this CreateFieldDto fieldDto)
         {

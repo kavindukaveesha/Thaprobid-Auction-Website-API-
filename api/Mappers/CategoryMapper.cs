@@ -18,7 +18,8 @@ namespace api.Mappers
                 CategoryImageUrl = categoryModel.CategoryImageUrl,
                 CategoryDescription = categoryModel.CategoryDescription,
                 IsEnabled = categoryModel.IsEnabled,
-                FieldId = categoryModel.FieldId
+                FieldId = categoryModel.FieldId,
+                SubCategories = categoryModel.SubCategories.Select(c => c.ToSubCategorydDto()).ToList()
 
             };
         }

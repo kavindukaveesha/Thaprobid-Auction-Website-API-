@@ -19,6 +19,9 @@ namespace api.data
 
         public DbSet<Field> Fields { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<SubCategory> SubCategories { get; set; }
+        public DbSet<Auction> Auctions { get; set; }
+        public DbSet<AuctionLotItem> AuctionLotItems { get; set; }
 
 
     }

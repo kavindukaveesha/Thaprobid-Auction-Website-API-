@@ -16,5 +16,7 @@ namespace api.Models
         public DateTime UpdatedDateTime { get; set; } = DateTime.Now;
         public int? FieldId { get; set; }
 
+        public List<SubCategory> SubCategories { get; set; } = new List<SubCategory>();
+
     }
 }

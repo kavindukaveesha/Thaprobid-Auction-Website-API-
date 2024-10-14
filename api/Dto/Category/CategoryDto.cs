@@ -16,5 +16,7 @@ namespace api.Dto.Field
         public DateTime UpdatedDateTime { get; set; } = DateTime.Now;
 
         public int? FieldId { get; set; }
+        public List<SubCategoryDto> SubCategories { get; set; }
+
     }
 }

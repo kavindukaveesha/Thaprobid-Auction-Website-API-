@@ -71,30 +71,27 @@ namespace api.repository
             try
             {
 
-                return _context.Categories.ToList();
 
-                //     var categories = _context.Categories.AsQueryable();
-                //     if (!String.IsNullOrWhiteSpace(queryObject.CategoryName))
-                //     {
-                //         categories = categories.Where(s => s.CategoryName.Contains(queryObject.CategoryName));
-                //     }
-                //     if (!String.IsNullOrWhiteSpace(queryObject.CategoryDescription))
-                //     {
-                //         categories = categories.Where(s => s.CategoryDescription.Contains(queryObject.CategoryDescription));
-                //     }
 
-                //     if (!string.IsNullOrWhiteSpace(queryObject.SortBy))
-                //     {
-                //         if (queryObject.SortBy.Equals("CategoryName", StringComparison.OrdinalIgnoreCase))
-                //         {
-                //             categories = queryObject.IsDecsending ? categories.OrderByDescending(s => s.CategoryName) : categories.OrderBy(s => s.CategoryName);
-                //         }
-                //     }
+                var categories = _context.Categories.Include(s => s.SubCategories).AsQueryable();
+                if (!String.IsNullOrWhiteSpace(queryObject.CategoryName))
+                {
+                    categories = categories.Where(s => s.CategoryName.Contains(queryObject.CategoryName));
+                }
 
-                //     var skipNumber = (queryObject.PageNumber - 1) * queryObject.PageSize;
 
-                //     return await categories.Skip(skipNumber).Take(queryObject.PageSize).ToListAsync();
-                // 
+                if (!string.IsNullOrWhiteSpace(queryObject.SortBy))
+                {
+                    if (queryObject.SortBy.Equals("CategoryName", StringComparison.OrdinalIgnoreCase))
+                    {
+                        categories = queryObject.IsDecsending ? categories.OrderByDescending(s => s.CategoryName) : categories.OrderBy(s => s.CategoryName);
+                    }
+                }
+
+                var skipNumber = (queryObject.PageNumber - 1) * queryObject.PageSize;
+
+                return await categories.Skip(skipNumber).Take(queryObject.PageSize).ToListAsync();
+
             }
 
             catch (Exception ex)
@@ -107,7 +104,7 @@ namespace api.repository
         {
             try
             {
-                return await _context.Categories.FirstOrDefaultAsync(i => i.CategoryId == id);
+                return await _context.Categories.Include(s => s.SubCategories).FirstOrDefaultAsync(i => i.CategoryId == id);
             }
             catch (Exception ex)
             {
@@ -115,7 +112,10 @@ namespace api.repository
             }
         }
 
-
+        public async Task<bool> IsCategoryExist(int id)
+        {
+            return await _context.Categories.AnyAsync(i => i.CategoryId == id);
+        }
 
         public async Task<Category?> UpdateCategoryAsync(int id, UpdateCategoryDto categoryDto)
         {

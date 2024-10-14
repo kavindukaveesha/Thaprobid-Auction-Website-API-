@@ -15,5 +15,6 @@ namespace api.Interfaces
         Task<Category> CreateCategoryAsync(Category categoryModel);
         Task<Category?> UpdateCategoryAsync(int id, UpdateCategoryDto categoryDto);
         Task<Category?> DeleteCategoryAsync(int id);
+        Task<bool> IsCategoryExist(int id);
     }
 }

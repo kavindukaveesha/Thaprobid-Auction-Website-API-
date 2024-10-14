@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api.data;
 
@@ -11,9 +12,11 @@ using api.data;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241013224724_uaddauctiondetails")]
+    partial class uaddauctiondetails
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -85,9 +88,8 @@ namespace api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("AuctionRegisterId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("AuctionRegisterId")
+                        .HasColumnType("int");
 
                     b.Property<string>("AuctionStatus")
                         .IsRequired()
@@ -137,59 +139,6 @@ namespace api.Migrations
                     b.HasKey("AuctionID");
 
                     b.ToTable("Auctions");
-                });
-
-            modelBuilder.Entity("api.Models.AuctionLotItem", b =>
-                {
-                    b.Property<int>("AuctionLotItemId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AuctionLotItemId"));
-
-                    b.Property<decimal>("AdditionalFees")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("AuctionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BidInterval")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("EstimateBidEndPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("EstimateBidStartPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("IsSold")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LotCondition")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LotDescription")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LotImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LotName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("ShippingCost")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("WinningBidderId")
-                        .HasColumnType("int");
-
-                    b.HasKey("AuctionLotItemId");
-
-                    b.ToTable("AuctionLotItems");
                 });
 
             modelBuilder.Entity("api.Models.Category", b =>

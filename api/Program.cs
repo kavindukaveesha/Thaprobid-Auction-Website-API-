@@ -32,6 +32,9 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 // Repository
 builder.Services.AddScoped<IFieldRepository, FieldRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ISubCategoryRepository, SubCategoryRepository>();
+builder.Services.AddScoped<IAuctionRepository, AuctionRepository>();
+builder.Services.AddScoped<IAuctionLotRepository, AuctionLotRepository>();
 
 // Exception Handlers
 builder.Services.AddSingleton<GlobalExceptionHandler>();
