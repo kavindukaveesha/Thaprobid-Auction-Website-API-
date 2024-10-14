@@ -36,5 +36,9 @@ namespace api.Dto.Auction
         public decimal ShippingCost { get; set; }
 
         public int BidInterval { get; set; }
+
+        public int FieldId { get; set; }
+        public int CategoryId { get; set; }
+        public int SubCategoryId { get; set; }
     }
 }

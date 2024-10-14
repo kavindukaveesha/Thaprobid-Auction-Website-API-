@@ -46,6 +46,9 @@ namespace api.Mappers
                 ShippingCost = auctionItemLotCreateDto.ShippingCost,
                 BidInterval = auctionItemLotCreateDto.BidInterval,
                 AuctionId = auctionId,
+                FieldId = auctionItemLotCreateDto.FieldId,
+                CategoryId = auctionItemLotCreateDto.CategoryId,
+                SubCategoryId = auctionItemLotCreateDto.SubCategoryId
 
 
             };

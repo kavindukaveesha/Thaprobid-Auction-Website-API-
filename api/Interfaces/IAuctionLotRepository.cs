@@ -8,6 +8,11 @@ namespace api.Interfaces
 {
     public interface IAuctionLotRepository
     {
-        Task<AuctionLotItem?> AddnewItemAsync(AuctionLotItem auctionLotItemModel);
+        Task<List<Category>> GetAllLotItemsAsync();
+        Task<AuctionLotItem?> AddnewLotItemAsync(AuctionLotItem auctionLotItemModel);
+        Task<Category?> GetLotItemByIdAsync(int id);
+        //  Task<Category?> UpdateLotItemAsync(int id, UpdateCategoryDto categoryDto);
+        Task<Category?> DeleteLotItemAsync(int id);
+
     }
 }

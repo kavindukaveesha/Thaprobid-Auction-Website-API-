@@ -7,6 +7,7 @@ using api.dto.response;
 using api.Dto.Auction;
 using api.Interfaces;
 using api.Mappers;
+using Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controller.Client
@@ -17,10 +18,12 @@ namespace api.Controller.Client
     {
         private readonly IAuctionRepository _auctionRepo;
         private readonly IAuctionLotRepository _auctionLot;
-        public ClientAuctionManagement(IAuctionRepository auctionRepo, IAuctionLotRepository auctionLot)
+        private readonly IFieldRepository _FieldRepo;
+        public ClientAuctionManagement(IAuctionRepository auctionRepo, IAuctionLotRepository auctionLot, IFieldRepository FieldRepo)
         {
             _auctionRepo = auctionRepo;
             _auctionLot = auctionLot;
+            _FieldRepo = FieldRepo;
         }
 
         //create new auction
@@ -51,9 +54,14 @@ namespace api.Controller.Client
             //check auction available or not
             if (!await _auctionRepo.IsAuctionExist(auctionId))
             {
-                return NotFound(new ApiErrorDto(404, "NOT_FOUND", $"No stock found with ID: {auctionId}"));
+                return NotFound(new ApiErrorDto(404, "NOT_FOUND", $"No Auction found with ID: {auctionId}"));
 
             }
+            if (!await _FieldRepo.IsFieldExist(auctionItemLotCreateDto.FieldId))
+            {
+                return NotFound(new ApiErrorDto(404, "NOT_FOUND", $"No Field found with ID: {auctionItemLotCreateDto.FieldId}"));
+            }
+
             var auction = await _auctionRepo.FindAuctionBYId(auctionId);
             var existSellerId = auction.SellerId;
 
@@ -68,7 +76,7 @@ namespace api.Controller.Client
 
 
             var lotItemModel = auctionItemLotCreateDto.ToAuctionLotItemFromCreateDto(auctionId);
-            await _auctionLot.AddnewItemAsync(lotItemModel);
+            await _auctionLot.AddnewLotItemAsync(lotItemModel);
             return Ok();
 
 

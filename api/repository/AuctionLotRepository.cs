@@ -18,7 +18,7 @@ namespace api.repository
         {
             _context = context;
         }
-        public async Task<AuctionLotItem?> AddnewItemAsync(AuctionLotItem auctionLotItemModel)
+        public async Task<AuctionLotItem?> AddnewLotItemAsync(AuctionLotItem auctionLotItemModel)
         {
             if (auctionLotItemModel == null)
             {
@@ -35,6 +35,21 @@ namespace api.repository
             {
                 throw new BadRequestException("An error occurred while creating a new auction lot item. Please try again later.", ex);
             }
+        }
+
+        public Task<Category?> DeleteLotItemAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<Category>> GetAllLotItemsAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Category?> GetLotItemByIdAsync(int id)
+        {
+            throw new NotImplementedException();
         }
     }
 }

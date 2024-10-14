@@ -18,6 +18,9 @@ namespace api.Models
 
         public int AuctionId { get; set; }
 
+        public int FieldId { get; set; }
+        public int CategoryId { get; set; }
+        public int SubCategoryId { get; set; }
 
         public string LotName { get; set; } = String.Empty;
         public string LotDescription { get; set; } = String.Empty;
