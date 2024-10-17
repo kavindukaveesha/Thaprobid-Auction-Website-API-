@@ -53,7 +53,9 @@ builder.Services.AddAuthentication(Options =>
     }
 );
 
-//add identtity
+//add Identity
+builder.Services.AddDefaultIdentity<IdentityUser>(Options => Options.SignIn.RequireConfirmedAccount = false)
+    .AddEntityFrameworkStores<ApplicationDBContext>();
 
 //newtonjson for connections
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
