@@ -7,6 +7,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Interfaces;
 using api.Interfaces;
+using api.Configurations;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +26,33 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
+
+//Jwt services
+builder.Services.AddAuthentication(Options =>
+{
+    Options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    Options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    Options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(
+    jwt =>
+    {
+        var key = Encoding.ASCII.GetBytes(builder.Configuration.GetSection("JwtConfig:Secret").Value);
+
+        jwt.SaveToken = true;
+        jwt.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuer = false,//for dev
+            ValidateAudience = false,
+            RequireExpirationTime = false,//for dev...needs to be updated when refresh token is run
+            ValidateLifetime = true
+        };
+    }
+);
+
 //add identtity
 
 //newtonjson for connections
@@ -86,7 +117,9 @@ app.UseExceptionHandler(appError =>
 });
 // Use CORS policy
 app.UseCors("AllowReactApp");
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 app.Run();
