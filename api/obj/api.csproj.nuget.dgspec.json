@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\SOFTWERE ENGENEERING\\My-Projects\\C#_Projects\\Thaprobid-Auction-Website-API-\\api\\api.csproj": {}
+    "D:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\api.csproj": {}
   },
   "projects": {
-    "D:\\SOFTWERE ENGENEERING\\My-Projects\\C#_Projects\\Thaprobid-Auction-Website-API-\\api\\api.csproj": {
+    "D:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\SOFTWERE ENGENEERING\\My-Projects\\C#_Projects\\Thaprobid-Auction-Website-API-\\api\\api.csproj",
+        "projectUniqueName": "D:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\api.csproj",
         "projectName": "api",
-        "projectPath": "D:\\SOFTWERE ENGENEERING\\My-Projects\\C#_Projects\\Thaprobid-Auction-Website-API-\\api\\api.csproj",
+        "projectPath": "D:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\api.csproj",
         "packagesPath": "C:\\Users\\Kavindu Kaveesha\\.nuget\\packages\\",
-        "outputPath": "D:\\SOFTWERE ENGENEERING\\My-Projects\\C#_Projects\\Thaprobid-Auction-Website-API-\\api\\obj\\",
+        "outputPath": "D:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "E:\\Visual Studio\\SDK\\NuGetPackages"
