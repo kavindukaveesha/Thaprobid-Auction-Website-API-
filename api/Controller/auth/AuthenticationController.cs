@@ -3,6 +3,7 @@ using api.Interfaces;
 using api.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -16,12 +17,46 @@ namespace api.Controller.auth
     public class AuthenticationController : ControllerBase
     {
         private readonly UserManager<AppUser> _userManager;
+        private readonly SignInManager<AppUser> _signInManager; // Add SignInManager
         private readonly ItockenService _tokenService;
 
-        public AuthenticationController(UserManager<AppUser> userManager, ItockenService tokenService)
+        public AuthenticationController(
+            UserManager<AppUser> userManager,
+            SignInManager<AppUser> signInManager, // Inject SignInManager
+            ItockenService tokenService)
         {
             _userManager = userManager;
+            _signInManager = signInManager;
             _tokenService = tokenService;
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            // Find user by email (case-insensitive)
+            var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Email.ToLower() == loginDto.Email.ToLower());
+
+            if (user == null)
+                return Unauthorized("Invalid email or password");
+
+            // Use SignInManager for password check and handling lockout, etc.
+            var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
+
+            if (!result.Succeeded)
+                return Unauthorized("Invalid email or password");
+
+            // Return user data and token on successful login
+            return Ok(
+                new NewUserDto
+                {
+                    UserName = user.UserName,
+                    Email = user.Email,
+                    Token = _tokenService.CreateToken(user)
+                }
+            );
         }
 
         [HttpPost("register")]
@@ -49,7 +84,7 @@ namespace api.Controller.auth
                            new NewUserDto
                            {
                                UserName = appUser.UserName,
-                               Email = appUser.UserName,
+                               Email = appUser.Email,
                                Token = _tokenService.CreateToken(appUser),
                            }
                         );

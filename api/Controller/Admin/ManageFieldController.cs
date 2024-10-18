@@ -7,6 +7,7 @@ using api.Dto.Field;
 using api.Helpers;
 using api.Mappers;
 using Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controller.Client
@@ -16,6 +17,8 @@ namespace api.Controller.Client
     /// </summary>
     [Route("api/admin/manage-fields")] // Base route for all endpoints in this controller
     [ApiController] // Indicates this is an API controller
+    [Authorize]
+
     public class ManageFieldController : ControllerBase
     {
         private readonly IFieldRepository _fieldRepo;
@@ -34,7 +37,7 @@ namespace api.Controller.Client
         /// </summary>
         /// <param name="queryObject">Object containing query parameters for filtering, sorting, and pagination.</param>
         /// <returns>An IActionResult containing a list of fields or an appropriate error response.</returns>
-        [HttpGet] // Attribute for GET requests
+        [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] FieldQueryObject queryObject)
         {
             var fields = await _fieldRepo.GetAllFieldsAsync(queryObject);
