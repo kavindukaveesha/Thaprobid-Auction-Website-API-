@@ -6,6 +6,7 @@ using MailKit.Net.Smtp;
 using MimeKit;
 using System.Threading.Tasks;
 using api.Interfaces;
+using Microsoft.Extensions.Configuration; // Import IConfiguration
 
 namespace api.repository
 {
@@ -15,19 +16,21 @@ namespace api.repository
         private readonly int _smtpPort;
         private readonly string _smtpUser;
         private readonly string _smtpPass;
+        private readonly string _senderName; // for app name in "from" address
 
-        public EmailService(string smtpServer, int smtpPort, string smtpUser, string smtpPass)
+        public EmailService(IConfiguration configuration)
         {
-            _smtpServer = smtpServer;
-            _smtpPort = smtpPort;
-            _smtpUser = smtpUser;
-            _smtpPass = smtpPass;
+            _smtpServer = configuration["EmailSettings:SmtpServer"];
+            _smtpPort = int.Parse(configuration["EmailSettings:SmtpPort"]);
+            _smtpUser = configuration["EmailSettings:SmtpUsername"];
+            _smtpPass = configuration["EmailSettings:SmtpPassword"];
+            _senderName = configuration["EmailSettings:SenderName"]; // Load app name
         }
 
         public async Task SendEmailAsync(string email, string subject, string message)
         {
             var emailMessage = new MimeMessage();
-            emailMessage.From.Add(new MailboxAddress("Your App Name", _smtpUser));
+            emailMessage.From.Add(new MailboxAddress(_senderName, _smtpUser)); // Use app name
             emailMessage.To.Add(new MailboxAddress("", email));
             emailMessage.Subject = subject;
             emailMessage.Body = new TextPart("html") { Text = message };
