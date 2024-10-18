@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "JZbTWfh9OEU=",
+  "dgSpecHash": "MHg9vo2kw/4=",
   "success": true,
-  "projectFilePath": "D:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\api.csproj",
+  "projectFilePath": "D:\\SOFTWERE ENGENEERING\\My-Projects\\sa_project\\api\\api.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Kavindu Kaveesha\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\Kavindu Kaveesha\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",
@@ -63,6 +63,7 @@
     "C:\\Users\\Kavindu Kaveesha\\.nuget\\packages\\mono.texttemplating\\2.2.1\\mono.texttemplating.2.2.1.nupkg.sha512",
     "C:\\Users\\Kavindu Kaveesha\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512",
     "C:\\Users\\Kavindu Kaveesha\\.nuget\\packages\\newtonsoft.json.bson\\1.0.2\\newtonsoft.json.bson.1.0.2.nupkg.sha512",
+    "C:\\Users\\Kavindu Kaveesha\\.nuget\\packages\\restsharp\\112.1.0\\restsharp.112.1.0.nupkg.sha512",
     "C:\\Users\\Kavindu Kaveesha\\.nuget\\packages\\swashbuckle.aspnetcore\\6.4.0\\swashbuckle.aspnetcore.6.4.0.nupkg.sha512",
     "C:\\Users\\Kavindu Kaveesha\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\6.4.0\\swashbuckle.aspnetcore.swagger.6.4.0.nupkg.sha512",
     "C:\\Users\\Kavindu Kaveesha\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\6.4.0\\swashbuckle.aspnetcore.swaggergen.6.4.0.nupkg.sha512",

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\api.csproj": {}
+    "D:\\SOFTWERE ENGENEERING\\My-Projects\\sa_project\\api\\api.csproj": {}
   },
   "projects": {
-    "D:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\api.csproj": {
+    "D:\\SOFTWERE ENGENEERING\\My-Projects\\sa_project\\api\\api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\api.csproj",
+        "projectUniqueName": "D:\\SOFTWERE ENGENEERING\\My-Projects\\sa_project\\api\\api.csproj",
         "projectName": "api",
-        "projectPath": "D:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\api.csproj",
+        "projectPath": "D:\\SOFTWERE ENGENEERING\\My-Projects\\sa_project\\api\\api.csproj",
         "packagesPath": "C:\\Users\\Kavindu Kaveesha\\.nuget\\packages\\",
-        "outputPath": "D:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\obj\\",
+        "outputPath": "D:\\SOFTWERE ENGENEERING\\My-Projects\\sa_project\\api\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "E:\\Visual Studio\\SDK\\NuGetPackages"
@@ -89,6 +89,10 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[8.0.0, )"
+            },
+            "RestSharp": {
+              "target": "Package",
+              "version": "[112.1.0, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",

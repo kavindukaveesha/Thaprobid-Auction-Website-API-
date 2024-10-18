@@ -16,10 +16,9 @@ using api.repository;
 using api.data;
 using api.Service;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-
-
 
 // ========================
 // 1. Add Services to the Container
@@ -27,19 +26,22 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add Identity services with custom configuration (UserManager and RoleManager)
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
-
-
 {
     options.SignIn.RequireConfirmedAccount = false;
     options.SignIn.RequireConfirmedEmail = true;
+    options.Lockout.AllowedForNewUsers = true;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(4);
+    options.Lockout.MaxFailedAccessAttempts = 5;
     // Configure password policy
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
     options.Password.RequireUppercase = true;
     options.Password.RequireNonAlphanumeric = true;
     options.Password.RequiredLength = 12;
+    // Email confirmation
+    options.Tokens.EmailConfirmationTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
 })
-.AddEntityFrameworkStores<ApplicationDBContext>() // Use EF Core for Identity
+.AddEntityFrameworkStores<ApplicationDBContext>()  // Use EF Core for Identity
 .AddDefaultTokenProviders(); // Token provider for password reset, etc.
 
 // Add Authentication (JWT Bearer)
@@ -53,17 +55,14 @@ builder.Services.AddAuthentication(options =>
     // Configure JWT validation parameters
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = true, // Ensure token has a valid issuer
+        ValidateIssuer = true,  // Ensure token has a valid issuer
         ValidIssuer = builder.Configuration["JWT:Issuer"],
-
-        ValidateAudience = true, // Ensure token is intended for this audience
+        ValidateAudience = true,  // Ensure token is intended for this audience
         ValidAudience = builder.Configuration["JWT:Audience"],
-
-        ValidateIssuerSigningKey = true, // Validate signing key
+        ValidateIssuerSigningKey = true,  // Validate signing key
         IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"])), // Key used to sign token
-
-        ValidateLifetime = true // Validate expiration
+            Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"])),  // Key used to sign token
+        ValidateLifetime = true  // Validate expiration
     };
 });
 
@@ -80,11 +79,11 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-// Add Swagger for API documentation in development mode
+// Add Swagger for API documentation
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//add swager auth
+// Add Swagger Authentication
 builder.Services.AddSwaggerGen(option =>
 {
     option.SwaggerDoc("v1", new OpenApiInfo { Title = "Demo API", Version = "v1" });
@@ -104,11 +103,11 @@ builder.Services.AddSwaggerGen(option =>
             {
                 Reference = new OpenApiReference
                 {
-                    Type=ReferenceType.SecurityScheme,
-                    Id="Bearer"
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
                 }
             },
-            new string[]{}
+            new string[] { }
         }
     });
 });
@@ -120,7 +119,7 @@ builder.Services.AddScoped<ISubCategoryRepository, SubCategoryRepository>();
 builder.Services.AddScoped<IAuctionRepository, AuctionRepository>();
 builder.Services.AddScoped<IAuctionLotRepository, AuctionLotRepository>();
 builder.Services.AddScoped<ItockenService, TokenService>();
-builder.Services.AddTransient<IEmailService, EmailService>();
+builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 
 // Register custom global exception handlers
@@ -131,75 +130,41 @@ builder.Services.AddSingleton<NotFoundExceptionHandler>();
 // Enable Problem Details middleware (for standard API error responses)
 builder.Services.AddProblemDetails();
 
-// Add CORS policy to allow connections from frontend (React in this case)
+// Add CORS policy (allowing all origins for now, can be customized)
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReactApp", policy =>
+    options.AddPolicy("AllowAll", builder =>
     {
-        policy.WithOrigins("http://localhost:3000")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
     });
 });
 
-builder.Services.AddRouting(options => options.LowercaseUrls = true);
-
+// ========================
+// 2. Configure Middleware Pipeline
+// ========================
 var app = builder.Build();
 
-// ========================
-// 2. Configure the HTTP Request Pipeline
-// ========================
-
+// Enable Swagger in development environment
 if (app.Environment.IsDevelopment())
 {
-    // Enable Swagger in development for API exploration
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Demo API v1"));
+}
+else
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();  // Enable HTTP Strict Transport Security in production
 }
 
-// Global exception handling for catching all unhandled exceptions
-app.UseExceptionHandler(appError =>
-{
-    appError.Run(async context =>
-    {
-        // Extract the exception details
-        var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
-        var exception = exceptionHandlerPathFeature?.Error;
+app.UseHttpsRedirection();  // Ensure HTTPS redirection
+app.UseRouting();           // Enable routing
+app.UseCors("AllowAll");     // Use CORS policy
 
-        // Resolve the handlers from DI
-        var globalExceptionHandler = context.RequestServices.GetService<GlobalExceptionHandler>();
-        var badRequestExceptionHandler = context.RequestServices.GetService<BadRequestExceptionHandler>();
-        var notFoundExceptionHandler = context.RequestServices.GetService<NotFoundExceptionHandler>();
+app.UseAuthentication();     // Enable authentication
+app.UseAuthorization();      // Enable authorization
 
-        // Use specific exception handlers in order of priority
-        if (notFoundExceptionHandler != null && await notFoundExceptionHandler.TryHandleAsync(context, exception, CancellationToken.None))
-            return;
+app.MapControllers();        // Map controllers
 
-        if (badRequestExceptionHandler != null && await badRequestExceptionHandler.TryHandleAsync(context, exception, CancellationToken.None))
-            return;
-
-        if (globalExceptionHandler != null && await globalExceptionHandler.TryHandleAsync(context, exception, CancellationToken.None))
-            return;
-    });
-});
-
-// Enable CORS for requests from the React frontend
-app.UseCors("AllowReactApp");
-
-// Use HTTPS redirection for all requests
-app.UseHttpsRedirection();
-
-// Use Authentication and Authorization middleware
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.UseRouting();
-
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-});
-
-
-// Run the application
 app.Run();
