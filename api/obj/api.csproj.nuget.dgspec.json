@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "D:\\C#\\New folder\\api\\api.csproj": {}
+    "D:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\api.csproj": {}
   },
   "projects": {
-    "D:\\C#\\New folder\\api\\api.csproj": {
+    "D:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\C#\\New folder\\api\\api.csproj",
+        "projectUniqueName": "D:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\api.csproj",
         "projectName": "api",
-        "projectPath": "D:\\C#\\New folder\\api\\api.csproj",
-        "packagesPath": "C:\\Users\\I Pasith\\.nuget\\packages\\",
-        "outputPath": "D:\\C#\\New folder\\api\\obj\\",
+        "projectPath": "D:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\api.csproj",
+        "packagesPath": "C:\\Users\\Kavindu Kaveesha\\.nuget\\packages\\",
+        "outputPath": "D:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "E:\\Visual Studio\\SDK\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\I Pasith\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Kavindu Kaveesha\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -106,7 +110,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.303/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
