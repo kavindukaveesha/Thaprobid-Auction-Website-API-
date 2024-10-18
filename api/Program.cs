@@ -1,6 +1,5 @@
 using api.Handlers;
 using api.Interfaces;
-using api.Configurations;
 using api.Dto.Auth;
 using api.Models;
 using Microsoft.EntityFrameworkCore;

@@ -1,4 +1,3 @@
-using api.Configurations;
 using api.Dto.Auth;
 using api.Models;
 using Microsoft.AspNetCore.Identity;
@@ -10,13 +9,14 @@ using System.Text;
 
 namespace api.Controller.auth
 {
-    [ApiController]
+
     [Route("api/auth")]
+    [ApiController]
     public class AuthenticationController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<AppUser> _userManager;
 
-        public AuthenticationController(UserManager<IdentityUser> userManager)
+        public AuthenticationController(UserManager<AppUser> userManager)
         {
             _userManager = userManager;
         }
@@ -35,7 +35,7 @@ namespace api.Controller.auth
                     Email = registerDto.Email
                 };
 
-                var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
+                var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password!);
 
                 if (createdUser.Succeeded)
                 {

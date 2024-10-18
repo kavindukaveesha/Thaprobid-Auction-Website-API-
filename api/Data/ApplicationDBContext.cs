@@ -9,7 +9,7 @@ using Models;
 
 namespace api.data
 {
-    public class ApplicationDBContext : IdentityDbContext<IdentityUser>
+    public class ApplicationDBContext : IdentityDbContext<AppUser>
     {
         public ApplicationDBContext(DbContextOptions<ApplicationDBContext> dbContextOptions)
             : base(dbContextOptions)
