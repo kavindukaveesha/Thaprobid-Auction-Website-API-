@@ -19,13 +19,19 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+
 // ========================
 // 1. Add Services to the Container
 // ========================
 
 // Add Identity services with custom configuration (UserManager and RoleManager)
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
+
+
 {
+    options.SignIn.RequireConfirmedAccount = false;
+    options.SignIn.RequireConfirmedEmail = true;
     // Configure password policy
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
@@ -114,6 +120,8 @@ builder.Services.AddScoped<ISubCategoryRepository, SubCategoryRepository>();
 builder.Services.AddScoped<IAuctionRepository, AuctionRepository>();
 builder.Services.AddScoped<IAuctionLotRepository, AuctionLotRepository>();
 builder.Services.AddScoped<ItockenService, TokenService>();
+builder.Services.AddTransient<IEmailService, EmailService>();
+
 
 // Register custom global exception handlers
 builder.Services.AddSingleton<GlobalExceptionHandler>();
@@ -183,8 +191,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Map controllers to routes
-app.MapControllers();
+
 
 // Run the application
 app.Run();

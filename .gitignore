@@ -4,4 +4,7 @@
 # Ignore migration files
 
 **/Migrations/*
+**/testapi/*
 
+
+.fake
