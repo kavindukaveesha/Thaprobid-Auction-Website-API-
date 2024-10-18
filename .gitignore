@@ -2,4 +2,6 @@
 .vs/
 
 # Ignore migration files
+
 **/Migrations/*
+
