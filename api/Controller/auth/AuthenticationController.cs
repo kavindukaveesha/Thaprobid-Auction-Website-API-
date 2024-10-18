@@ -15,121 +15,52 @@ namespace api.Controller.auth
     public class AuthenticationController : ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly IConfiguration _configuration;
 
-        public AuthenticationController(UserManager<IdentityUser> userManager, IConfiguration configuration)
+        public AuthenticationController(UserManager<IdentityUser> userManager)
         {
             _userManager = userManager;
-            _configuration = configuration;
         }
 
-        [HttpPost]
-        [Route("register")]
-        public async Task<IActionResult> Register([FromBody] UserRegistrationRequestDto requestDto)
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] UserRegistrationRequestDto registerDto)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
-            var userExist = await _userManager.FindByEmailAsync(requestDto.Email);
-
-            if (userExist != null)
-            {
-                return BadRequest(new AuthResult()
+                var appUser = new AppUser
                 {
-                    Result = false,
-                    Errors = new List<string>() { "Email already exists" }
-                });
-            }
+                    UserName = registerDto.Name,
+                    Email = registerDto.Email
+                };
 
-            var newUser = new IdentityUser()
-            {
-                Email = requestDto.Email,
-                UserName = requestDto.Email
-            };
+                var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
 
-            var isCreated = await _userManager.CreateAsync(newUser, requestDto.Password);
-
-            if (isCreated.Succeeded)
-            {
-                var token = GenerateJwtToken(newUser);
-
-                return Ok(new AuthResult()
+                if (createdUser.Succeeded)
                 {
-                    Result = true,
-                    Token = token
-                });
+                    var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
+                    if (roleResult.Succeeded)
+                    {
+                        return Ok(
+                           "user created"
+                        );
+                    }
+                    else
+                    {
+                        return StatusCode(500, roleResult.Errors);
+                    }
+                }
+                else
+                {
+                    return StatusCode(500, createdUser.Errors);
+                }
             }
-
-            return BadRequest(new AuthResult()
+            catch (Exception e)
             {
-                Result = false,
-                Errors = new List<string>() { "Server error" }
-            });
+                return StatusCode(500, e);
+            }
         }
 
-
-        // [HttpPost]
-        // [Route("login")]
-        // public async Task<IActionResult> Login([FromBody] UserLoginRequestDto requestDto)
-        // {
-        //     if (!ModelState.IsValid)
-        //     {
-        //         return BadRequest(ModelState);
-        //     }
-
-        //     var existingUser = await _userManager.FindByEmailAsync(requestDto.Email);
-
-        //     if (existingUser == null)
-        //     {
-        //         return BadRequest(new AuthResult()
-        //         {
-        //             Result = false,
-        //             Errors = new List<string> { "Invalid payload" }
-        //         });
-        //     }
-
-        //     var isCorrect = await _userManager.CheckPasswordAsync(existingUser, requestDto.Password);
-
-        //     if (!isCorrect)
-        //     {
-        //         return BadRequest(new AuthResult()
-        //         {
-        //             Result = false,
-        //             Errors = new List<string> { "Invalid Credentials" }
-        //         });
-        //     }
-
-        //     var jwtToken = GenerateJwtToken(existingUser);
-        //     return Ok(new AuthResult()
-        //     {
-        //         Result = true,
-        //         Token = jwtToken
-        //     });
-        // }
-
-        private string GenerateJwtToken(IdentityUser user)
-        {
-            var jwtTokenHandler = new JwtSecurityTokenHandler();
-
-            var key = Encoding.ASCII.GetBytes(_configuration["JwtConfig:Secret"]);
-
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[]
-                {
-            new Claim("Id", user.Id),
-            new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Iat, DateTime.Now.ToUniversalTime().ToString())
-                }),
-                Expires = DateTime.Now.AddHours(1),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
-            };
-            var token = jwtTokenHandler.CreateToken(tokenDescriptor);
-            return jwtTokenHandler.WriteToken(token);
-        }
     }
 }

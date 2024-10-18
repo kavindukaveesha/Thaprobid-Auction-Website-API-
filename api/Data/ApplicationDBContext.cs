@@ -1,21 +1,19 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using api.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Models;
 
+
 namespace api.data
 {
-    public class ApplicationDBContext : IdentityDbContext
+    public class ApplicationDBContext : IdentityDbContext<IdentityUser>
     {
-
-        public ApplicationDBContext(DbContextOptions dbContextOptions)
-        : base(dbContextOptions)
+        public ApplicationDBContext(DbContextOptions<ApplicationDBContext> dbContextOptions)
+            : base(dbContextOptions)
         {
-
         }
 
         public DbSet<Field> Fields { get; set; }
@@ -24,22 +22,26 @@ namespace api.data
         public DbSet<Auction> Auctions { get; set; }
         public DbSet<AuctionLotItem> AuctionLotItems { get; set; }
 
-
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(builder); // This is important!
+            base.OnModelCreating(builder);
 
-            builder.Entity<AuctionLotItem>(entity =>
+            // Seed initial roles
+            List<IdentityRole> roles = new List<IdentityRole>
             {
-                entity.Property(e => e.AdditionalFees).HasColumnType("decimal(18, 2)");
-                entity.Property(e => e.EstimateBidEndPrice).HasColumnType("decimal(18, 2)");
-                entity.Property(e => e.EstimateBidStartPrice).HasColumnType("decimal(18, 2)");
-                entity.Property(e => e.ShippingCost).HasColumnType("decimal(18, 2)");
-            });
+                new IdentityRole
+                {
+                    Name = "Admin",
+                    NormalizedName = "ADMIN"
+                },
+                new IdentityRole
+                {
+                    Name = "User",
+                    NormalizedName = "USER"
+                }
+            };
+
+            builder.Entity<IdentityRole>().HasData(roles);
         }
-
-
-
     }
 }

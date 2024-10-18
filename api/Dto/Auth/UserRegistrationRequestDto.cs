@@ -9,10 +9,11 @@ namespace api.Dto.Auth
     public class UserRegistrationRequestDto
     {
         [Required]
-        public String Name { get; set; }
+        public String? Name { get; set; }
         [Required]
-        public String Email { get; set; }
+        [EmailAddress]
+        public String? Email { get; set; }
         [Required]
-        public String Password { get; set; }
+        public String? Password { get; set; }
     }
 }
