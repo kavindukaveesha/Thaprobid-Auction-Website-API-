@@ -78,10 +78,12 @@ namespace api.Controller.Client
             var lotItemModel = auctionItemLotCreateDto.ToAuctionLotItemFromCreateDto(auctionId);
             await _auctionLot.AddnewLotItemAsync(lotItemModel);
             return Ok();
-
-
-
         }
+
+
+
+
+
 
 
 
