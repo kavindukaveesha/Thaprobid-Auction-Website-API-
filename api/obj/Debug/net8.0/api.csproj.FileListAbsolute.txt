@@ -282,7 +282,10 @@ D:\SOFTWERE ENGENEERING\My-Projects\Thaprobid-Auction-Website-API-\api\obj\Debug
 D:\SOFTWERE ENGENEERING\My-Projects\Thaprobid-Auction-Website-API-\api\obj\Debug\net8.0\api.pdb
 D:\SOFTWERE ENGENEERING\My-Projects\Thaprobid-Auction-Website-API-\api\obj\Debug\net8.0\api.genruntimeconfig.cache
 D:\SOFTWERE ENGENEERING\My-Projects\Thaprobid-Auction-Website-API-\api\obj\Debug\net8.0\ref\api.dll
+<<<<<<< Updated upstream
 D:\SOFTWERE ENGENEERING\My-Projects\Thaprobid-Auction-Website-API-\api\bin\Debug\net8.0\api.staticwebassets.runtime.json
 D:\SOFTWERE ENGENEERING\My-Projects\Thaprobid-Auction-Website-API-\api\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 D:\SOFTWERE ENGENEERING\My-Projects\Thaprobid-Auction-Website-API-\api\bin\Debug\net8.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
 D:\SOFTWERE ENGENEERING\My-Projects\Thaprobid-Auction-Website-API-\api\bin\Debug\net8.0\Microsoft.AspNetCore.Identity.UI.dll
+=======
+>>>>>>> Stashed changes

@@ -4849,11 +4849,19 @@
   "project": {
     "version": "1.0.0",
     "restore": {
+<<<<<<< Updated upstream
       "projectUniqueName": "d:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\api.csproj",
       "projectName": "api",
       "projectPath": "d:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\api.csproj",
       "packagesPath": "C:\\Users\\Kavindu Kaveesha\\.nuget\\packages\\",
       "outputPath": "d:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\obj\\",
+=======
+      "projectUniqueName": "D:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\api.csproj",
+      "projectName": "api",
+      "projectPath": "D:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\api.csproj",
+      "packagesPath": "C:\\Users\\Kavindu Kaveesha\\.nuget\\packages\\",
+      "outputPath": "D:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\obj\\",
+>>>>>>> Stashed changes
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "E:\\Visual Studio\\SDK\\NuGetPackages"

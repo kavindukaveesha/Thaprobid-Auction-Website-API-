@@ -1,6 +1,10 @@
 {
   "version": 2,
+<<<<<<< Updated upstream
   "dgSpecHash": "+d1rZiAtGA0=",
+=======
+  "dgSpecHash": "XPf1774sceY=",
+>>>>>>> Stashed changes
   "success": true,
   "projectFilePath": "D:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\api.csproj",
   "expectedPackageFiles": [
