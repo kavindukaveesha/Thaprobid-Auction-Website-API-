@@ -25,5 +25,21 @@ namespace api.data
         public DbSet<AuctionLotItem> AuctionLotItems { get; set; }
 
 
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder); // This is important!
+
+            builder.Entity<AuctionLotItem>(entity =>
+            {
+                entity.Property(e => e.AdditionalFees).HasColumnType("decimal(18, 2)");
+                entity.Property(e => e.EstimateBidEndPrice).HasColumnType("decimal(18, 2)");
+                entity.Property(e => e.EstimateBidStartPrice).HasColumnType("decimal(18, 2)");
+                entity.Property(e => e.ShippingCost).HasColumnType("decimal(18, 2)");
+            });
+        }
+
+
+
     }
 }

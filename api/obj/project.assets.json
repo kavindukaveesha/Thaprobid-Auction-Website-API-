@@ -4849,11 +4849,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "d:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\api.csproj",
+      "projectUniqueName": "D:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\api.csproj",
       "projectName": "api",
-      "projectPath": "d:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\api.csproj",
+      "projectPath": "D:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\api.csproj",
       "packagesPath": "C:\\Users\\Kavindu Kaveesha\\.nuget\\packages\\",
-      "outputPath": "d:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\obj\\",
+      "outputPath": "D:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "E:\\Visual Studio\\SDK\\NuGetPackages"
@@ -4955,5 +4955,13 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.303/PortableRuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Problem reading the cache file D:\\SOFTWERE ENGENEERING\\My-Projects\\Thaprobid-Auction-Website-API-\\api\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
+    }
+  ]
 }

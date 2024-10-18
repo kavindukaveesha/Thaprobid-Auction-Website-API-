@@ -1,16 +1,22 @@
-using api.data;
+
 using api.Handlers;
-using api.repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using Interfaces;
 using api.Interfaces;
 using api.Configurations;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
+using Microsoft.Extensions.Configuration;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
+using api.Dto.Auth;
+using Interfaces;
+using api.repository;
+using api.data;
+using api.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,50 +25,57 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
-
 // Database context
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+// Add JwtConfig to the DI container
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
 
-//Jwt services
-builder.Services.AddAuthentication(Options =>
+// Identity services configuration
+builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
-    Options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    Options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-    Options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequiredLength = 12;
 })
-.AddJwtBearer(
-    jwt =>
-    {
-        var key = Encoding.ASCII.GetBytes(builder.Configuration.GetSection("JwtConfig:Secret").Value);
-
-        jwt.SaveToken = true;
-        jwt.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(key),
-            ValidateIssuer = false,//for dev
-            ValidateAudience = false,
-            RequireExpirationTime = false,//for dev...needs to be updated when refresh token is run
-            ValidateLifetime = true
-        };
-    }
-);
-
-//add Identity
-builder.Services.AddDefaultIdentity<IdentityUser>(Options => Options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<ApplicationDBContext>();
 
-//newtonjson for connections
+
+// JWT services configuration
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(jwt =>
+{
+    var key = Encoding.ASCII.GetBytes(builder.Configuration["JwtConfig:Secret"]);
+    jwt.SaveToken = true;
+    jwt.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = false, // For development - set to true in production and configure
+        ValidateAudience = false, // For development - set to true in production and configure
+        RequireExpirationTime = true,
+        ValidateLifetime = true
+    };
+});
+
+
+// Add NewtonsoftJson for connections
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 });
-// Repository
+
+// Add Repositories (Make sure these are correctly registered)
 builder.Services.AddScoped<IFieldRepository, FieldRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ISubCategoryRepository, SubCategoryRepository>();
@@ -75,16 +88,17 @@ builder.Services.AddSingleton<BadRequestExceptionHandler>();
 builder.Services.AddSingleton<NotFoundExceptionHandler>();
 builder.Services.AddProblemDetails();
 
+// CORS policy
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReactApp",
-        policy =>
-        {
-            policy.WithOrigins("http://localhost:3000")  // React app URL
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        });
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
 });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -96,6 +110,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Global exception handler
 app.UseExceptionHandler(appError =>
 {
     appError.Run(async context =>
@@ -109,19 +124,19 @@ app.UseExceptionHandler(appError =>
 
         if (notFoundExceptionHandler != null && await notFoundExceptionHandler.TryHandleAsync(context, exception, CancellationToken.None))
             return;
-
         if (badRequestExceptionHandler != null && await badRequestExceptionHandler.TryHandleAsync(context, exception, CancellationToken.None))
             return;
-
         if (globalExceptionHandler != null && await globalExceptionHandler.TryHandleAsync(context, exception, CancellationToken.None))
             return;
     });
 });
+
 // Use CORS policy
 app.UseCors("AllowReactApp");
-
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
 app.Run();
