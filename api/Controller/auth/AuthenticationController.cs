@@ -1,12 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using api.Configurations;
 using api.Dto.Auth;
 using api.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace api.Controller.auth
 {
@@ -15,14 +15,13 @@ namespace api.Controller.auth
     public class AuthenticationController : ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly JwtConfig _jwtConfig;
-        public AuthenticationController(UserManager<IdentityUser> userManager, JwtConfig jwtConfig)
+        private readonly IConfiguration _configuration;
+
+        public AuthenticationController(UserManager<IdentityUser> userManager, IConfiguration configuration)
         {
             _userManager = userManager;
-            _jwtConfig = jwtConfig;
-
+            _configuration = configuration;
         }
-
 
         [HttpPost]
         [Route("register")]
@@ -30,42 +29,107 @@ namespace api.Controller.auth
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest(ModelState);
             }
-            var user_exist = await _userManager.FindByEmailAsync(requestDto.Email);
 
-            if (user_exist != null)
+            var userExist = await _userManager.FindByEmailAsync(requestDto.Email);
+
+            if (userExist != null)
             {
                 return BadRequest(new AuthResult()
                 {
                     Result = false,
-                    Errors = new List<string>(){
-                        "Email Already Exist"
-                    }
+                    Errors = new List<string>() { "Email already exists" }
                 });
             }
-            //create user
-            var new_user = new IdentityUser()
+
+            var newUser = new IdentityUser()
             {
                 Email = requestDto.Email,
                 UserName = requestDto.Email
             };
 
-            var is_created = await _userManager.CreateAsync(new_user, requestDto.Password);
-            if (is_created.Succeeded)
+            var isCreated = await _userManager.CreateAsync(newUser, requestDto.Password);
+
+            if (isCreated.Succeeded)
             {
-                //genarate token
+                var token = GenerateJwtToken(newUser);
+
+                return Ok(new AuthResult()
+                {
+                    Result = true,
+                    Token = token
+                });
             }
+
             return BadRequest(new AuthResult()
             {
-                Errors = new List<string>(){
-                    "Server Error."
-                 },
-                Result = false
-
+                Result = false,
+                Errors = new List<string>() { "Server error" }
             });
-
         }
 
+
+        // [HttpPost]
+        // [Route("login")]
+        // public async Task<IActionResult> Login([FromBody] UserLoginRequestDto requestDto)
+        // {
+        //     if (!ModelState.IsValid)
+        //     {
+        //         return BadRequest(ModelState);
+        //     }
+
+        //     var existingUser = await _userManager.FindByEmailAsync(requestDto.Email);
+
+        //     if (existingUser == null)
+        //     {
+        //         return BadRequest(new AuthResult()
+        //         {
+        //             Result = false,
+        //             Errors = new List<string> { "Invalid payload" }
+        //         });
+        //     }
+
+        //     var isCorrect = await _userManager.CheckPasswordAsync(existingUser, requestDto.Password);
+
+        //     if (!isCorrect)
+        //     {
+        //         return BadRequest(new AuthResult()
+        //         {
+        //             Result = false,
+        //             Errors = new List<string> { "Invalid Credentials" }
+        //         });
+        //     }
+
+        //     var jwtToken = GenerateJwtToken(existingUser);
+        //     return Ok(new AuthResult()
+        //     {
+        //         Result = true,
+        //         Token = jwtToken
+        //     });
+        // }
+
+        private string GenerateJwtToken(IdentityUser user)
+        {
+            var jwtTokenHandler = new JwtSecurityTokenHandler();
+
+            var key = Encoding.ASCII.GetBytes(_configuration["JwtConfig:Secret"]);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+            new Claim("Id", user.Id),
+            new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+            new Claim(JwtRegisteredClaimNames.Email, user.Email),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Iat, DateTime.Now.ToUniversalTime().ToString())
+                }),
+                Expires = DateTime.Now.AddHours(1),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
+            };
+            var token = jwtTokenHandler.CreateToken(tokenDescriptor);
+            return jwtTokenHandler.WriteToken(token);
+        }
     }
 }
