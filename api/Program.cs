@@ -14,6 +14,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Interfaces;
 using api.repository;
 using api.data;
+using api.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -82,6 +83,7 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ISubCategoryRepository, SubCategoryRepository>();
 builder.Services.AddScoped<IAuctionRepository, AuctionRepository>();
 builder.Services.AddScoped<IAuctionLotRepository, AuctionLotRepository>();
+builder.Services.AddScoped<ItockenService, TokenService>();
 
 // Register custom global exception handlers
 builder.Services.AddSingleton<GlobalExceptionHandler>();
