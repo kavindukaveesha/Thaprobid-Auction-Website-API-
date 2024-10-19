@@ -23,12 +23,12 @@ namespace api.Controller.auth
         }
 
 
-        [HttpPost]
-        [Route("register")]
-        public async Task<IActionResult> Register([FromBody] UserRegistrationRequestDto requestDto)
-        {
+        //[HttpPost]
+        //[Route("register")]
+        //public async Task<IActionResult> Register([FromBody] UserRegistrationRequestDto requestDto)
+        //{
 
-        }
+        //}
 
     }
 }

@@ -24,6 +24,9 @@ namespace api.data
         public DbSet<Auction> Auctions { get; set; }
         public DbSet<AuctionLotItem> AuctionLotItems { get; set; }
 
-
+        internal async Task SaveChangesAsync()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

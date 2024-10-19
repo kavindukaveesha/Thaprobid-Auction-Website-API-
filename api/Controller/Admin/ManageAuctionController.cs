@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using api.data;
 using api.Dto.Auction;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
 namespace api.Controller.Admin
 {
     [ApiController]
@@ -122,37 +117,35 @@ namespace api.Controller.Admin
 
 
 
-        // delete auction by ID
+       
+        // Delete auction by ID
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteAuctionById(int id)
         {
             try
             {
-                // get auction by ID
+                // Get auction by ID
                 var auction = await _dbContext.Auctions.FirstOrDefaultAsync(a => a.AuctionID == id);
 
                 if (auction == null)
                 {
-                    return NotFound(new { Message = $"Auction with ID {id} not found." });
+                    return NotFound(new { message = $"Auction with ID {id} not found." });
                 }
 
-
-                // remove auction from database
+                // Remove auction from the database
                 _dbContext.Auctions.Remove(auction);
 
-
-                // save ths changes
+                // Save the changes
                 await _dbContext.SaveChangesAsync();
 
                 return Ok(new { message = $"Auction with ID {id} has been deleted successfully." });
             }
             catch (Exception ex)
             {
-                {
-                    return StatusCode(500, new { Message = "An error occurred while deleting the auction.", Details = ex.Message });
-                }
+                return StatusCode(500, new { message = "An error occurred while deleting the auction.", details = ex.Message });
             }
-
         }
+
     }
+
 }
