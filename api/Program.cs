@@ -17,6 +17,7 @@ using api.data;
 using api.Service;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using api.Dto.EmailDto;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -119,7 +120,8 @@ builder.Services.AddScoped<ISubCategoryRepository, SubCategoryRepository>();
 builder.Services.AddScoped<IAuctionRepository, AuctionRepository>();
 builder.Services.AddScoped<IAuctionLotRepository, AuctionLotRepository>();
 builder.Services.AddScoped<ItockenService, TokenService>();
-builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddScoped<IEmailRepository, EmailSender>();
 
 
 // Register custom global exception handlers

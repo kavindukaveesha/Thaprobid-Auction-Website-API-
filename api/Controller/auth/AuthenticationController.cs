@@ -2,13 +2,10 @@ using api.Dto.Auth;
 using api.Interfaces;
 using api.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace api.Controller.auth
 {
@@ -19,52 +16,42 @@ namespace api.Controller.auth
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly ItockenService _tokenService;
-        private readonly IEmailSender _emailSender;
-        private readonly IConfiguration _configuration;
+        private readonly IEmailRepository _emailSender;
 
         public AuthenticationController(
             UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
             ItockenService tokenService,
-            IEmailSender emailSender,
-            IConfiguration configuration)
+            IEmailRepository emailSender)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenService = tokenService;
             _emailSender = emailSender;
-            _configuration = configuration;
         }
 
-
+        // Login endpoint
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            // Find user by email (case-insensitive)
             var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Email.ToLower() == loginDto.Email.ToLower());
             if (user == null)
                 return Unauthorized("Invalid email or password");
 
-            // Check if email is confirmed
             if (!await _userManager.IsEmailConfirmedAsync(user))
             {
-                return Unauthorized(new
-                {
-                    Errors = new List<string> { "Email is not confirmed" }
-                });
+                return Unauthorized(new { Errors = new List<string> { "Email is not confirmed" } });
             }
 
-            // Use SignInManager for password check and handling lockout, etc.
             var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, lockoutOnFailure: false);
             if (!result.Succeeded)
             {
                 return Unauthorized("Invalid email or password");
             }
 
-            // Generate and return token on successful login
             var token = _tokenService.CreateToken(user);
             return Ok(new NewUserDto
             {
@@ -74,62 +61,52 @@ namespace api.Controller.auth
             });
         }
 
+        // Registration endpoint
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] UserRegistrationRequestDto registerDto)
         {
-            try
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var appUser = new AppUser
             {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
+                UserName = registerDto.Name,
+                Email = registerDto.Email
+            };
 
-                var appUser = new AppUser
+            var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
+            if (createdUser.Succeeded)
+            {
+                var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
+                if (roleResult.Succeeded)
                 {
-                    UserName = registerDto.Name,
-                    Email = registerDto.Email
-                };
+                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
+                    var confirmationUrl = Url.Action(
+                        nameof(EmailVerification),
+                        "Authentication",
+                        new { email = appUser.Email, code = code },
+                        protocol: HttpContext.Request.Scheme);
 
-                var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password!);
-                if (createdUser.Succeeded)
-                {
-                    var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
-                    if (roleResult.Succeeded)
+                    await _emailSender.SendEmailAsync(appUser.Email, "Confirm your email",
+                        $"Please confirm your email by clicking this link: <a href='{confirmationUrl}'>Confirm Email</a>");
+
+                    return Ok(new
                     {
-                        // Generate email confirmation token
-                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
-
-                        // Create the confirmation URL
-                        var confirmationUrl = Url.Action(
-                            nameof(EmailVerification),
-                            "Authentication",
-                            new { email = appUser.Email, code = code },
-                            protocol: HttpContext.Request.Scheme);
-
-                        // Send email using an email service (e.g., SendGrid, SMTP)
-                        await _emailSender.SendEmailAsync(appUser.Email, "Confirm your email",
-                            $"Please confirm your email by clicking this link: <a href='{confirmationUrl}'>Confirm Email</a>");
-
-                        return Ok(new
-                        {
-                            message = $"Please confirm your email by checking your inbox: {appUser.Email}"
-                        });
-                    }
-                    else
-                    {
-                        return StatusCode(500, roleResult.Errors);
-                    }
+                        message = $"Please confirm your email by checking your inbox: {appUser.Email}"
+                    });
                 }
                 else
                 {
-                    return StatusCode(500, createdUser.Errors);
+                    return StatusCode(500, roleResult.Errors);
                 }
             }
-            catch (Exception e)
+            else
             {
-                return StatusCode(500, e.Message);
+                return StatusCode(500, createdUser.Errors);
             }
         }
 
-        // Email verification endpoint that handles email confirmation via the link
+        // Email Verification endpoint
         [HttpGet("verify-email")]
         public async Task<IActionResult> EmailVerification(string email, string code)
         {
@@ -141,22 +118,35 @@ namespace api.Controller.auth
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                return BadRequest("Invalid payload. User not found.");
+                return NotFound("User not found.");
             }
 
-            // Pass the correct code to confirm the email
             var result = await _userManager.ConfirmEmailAsync(user, code);
             if (result.Succeeded)
             {
-                return Ok(new
-                {
-                    message = "Email confirmed successfully!"
-                });
+                return Ok(new { message = "Email confirmed successfully!" });
             }
 
-            return BadRequest("Something went wrong while confirming the email.");
+            return BadRequest(new { Errors = result.Errors });
         }
 
+        // Resend Email Confirmation endpoint
+        // [HttpPost("resend-confirmation")]
+        // public async Task<IActionResult> ResendConfirmation([FromBody] ResendEmailConfirmationDto model)
+        // {
+        //     var user = await _userManager.FindByEmailAsync(model.Email);
+        //     if (user == null || await _userManager.IsEmailConfirmedAsync(user))
+        //     {
+        //         return BadRequest("Invalid request or email already confirmed.");
+        //     }
 
+        //     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        //     var confirmationUrl = Url.Action(nameof(EmailVerification), "Authentication", new { email = user.Email, code = code }, protocol: HttpContext.Request.Scheme);
+
+        //     await _emailSender.SendEmailAsync(user.Email, "Resend Confirmation",
+        //         $"Please confirm your email by clicking this link: <a href='{confirmationUrl}'>Confirm Email</a>");
+
+        //     return Ok(new { message = $"A new confirmation email has been sent to {user.Email}." });
+        // }
     }
 }
