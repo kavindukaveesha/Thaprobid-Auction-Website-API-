@@ -1,11 +1,21 @@
+using api.data;
 using api.Dto.Auth;
+using api.Dto.EmailDto;
+using api.Handlers;
 using api.Interfaces;
 using api.Models;
-using Microsoft.AspNetCore.Identity;
+using api.Models.security;
+using api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
+using Microsoft.Extensions.Options;
+using System;
+using System.Linq;
+using System.Security.Authentication;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
+
+
 
 namespace api.Controller.auth
 {
@@ -13,140 +23,178 @@ namespace api.Controller.auth
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
-        private readonly UserManager<AppUser> _userManager;
-        private readonly SignInManager<AppUser> _signInManager;
-        private readonly ItockenService _tokenService;
-        private readonly IEmailRepository _emailSender;
+        private readonly IUserService _authService;
+        private readonly IEmailRepository _emailService;
+        private readonly IOptions<EmailSettings> _emailSettings;
 
         public AuthenticationController(
-            UserManager<AppUser> userManager,
-            SignInManager<AppUser> signInManager,
-            ItockenService tokenService,
-            IEmailRepository emailSender)
+            IUserService authService,
+            IEmailRepository emailService,
+            IOptions<EmailSettings> emailSettings)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _tokenService = tokenService;
-            _emailSender = emailSender;
+            _authService = authService;
+            _emailService = emailService;
+            _emailSettings = emailSettings;
         }
 
-        // Login endpoint
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Email.ToLower() == loginDto.Email.ToLower());
-            if (user == null)
-                return Unauthorized("Invalid email or password");
-
-            if (!await _userManager.IsEmailConfirmedAsync(user))
-            {
-                return Unauthorized(new { Errors = new List<string> { "Email is not confirmed" } });
-            }
-
-            var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, lockoutOnFailure: false);
-            if (!result.Succeeded)
-            {
-                return Unauthorized("Invalid email or password");
-            }
-
-            var token = _tokenService.CreateToken(user);
-            return Ok(new NewUserDto
-            {
-                UserName = user.UserName,
-                Email = user.Email,
-                Token = token
-            });
-        }
-
-        // Registration endpoint
+        // Registration Endpoint
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] UserRegistrationRequestDto registerDto)
         {
             if (!ModelState.IsValid)
+            {
                 return BadRequest(ModelState);
+            }
 
-            var appUser = new AppUser
+            try
             {
-                UserName = registerDto.Name,
-                Email = registerDto.Email
-            };
-
-            var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
-            if (createdUser.Succeeded)
-            {
-                var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
-                if (roleResult.Succeeded)
+                var newUser = await _authService.CreateAppUserAsync(registerDto);
+                if (newUser == null)
                 {
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
-                    var confirmationUrl = Url.Action(
-                        nameof(EmailVerification),
-                        "Authentication",
-                        new { email = appUser.Email, code = code },
-                        protocol: HttpContext.Request.Scheme);
+                    return StatusCode(500, "User creation failed.");
+                }
 
-                    await _emailSender.SendEmailAsync(appUser.Email, "Confirm your email",
-                        $"Please confirm your email by clicking this link: <a href='{confirmationUrl}'>Confirm Email</a>");
+                await _authService.SendConfirmationEmailAsync(newUser);
 
-                    return Ok(new
-                    {
-                        message = $"Please confirm your email by checking your inbox: {appUser.Email}"
-                    });
+                return Ok(new { Message = "Registration successful, please confirm your email." });
+            }
+            catch (NotFoundExe ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception 
+                Console.WriteLine($"Registration error: {ex.Message}");
+                return StatusCode(500, "An error occurred during registration.");
+            }
+        }
+
+        // Email Confirmation Endpoint 
+        [HttpGet("confirm-email")]
+        public async Task<IActionResult> ConfirmEmail(string userId, string token)
+        {
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
+            {
+                return BadRequest("Invalid email confirmation request.");
+            }
+
+            try
+            {
+                bool success = await _authService.ConfirmEmailAsync(userId, token);
+                if (success)
+                {
+                    return Ok("Email confirmed successfully!");
                 }
                 else
                 {
-                    return StatusCode(500, roleResult.Errors);
+                    return BadRequest("Email confirmation failed.");
                 }
             }
-            else
+            catch (NotFoundExe ex)
             {
-                return StatusCode(500, createdUser.Errors);
+                return BadRequest(ex.Message);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "An error occurred during email confirmation.");
             }
         }
 
-        // Email Verification endpoint
-        [HttpGet("verify-email")]
-        public async Task<IActionResult> EmailVerification(string email, string code)
+        // Login Endpoint 
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(code))
+            if (!ModelState.IsValid)
             {
-                return BadRequest("Invalid payload. Email or code cannot be null.");
+                return BadRequest(ModelState);
             }
 
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
+            try
             {
-                return NotFound("User not found.");
+                var authResponse = await _authService.LoginAsync(loginDto);
+                return Ok(authResponse);
             }
-
-            var result = await _userManager.ConfirmEmailAsync(user, code);
-            if (result.Succeeded)
+            catch (InvalidCredentialException ex)
             {
-                return Ok(new { message = "Email confirmed successfully!" });
+                return Unauthorized(ex.Message);
             }
-
-            return BadRequest(new { Errors = result.Errors });
+            catch (EmailNotConfirmedException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Login error: {ex.Message}");
+                return StatusCode(500, "An error occurred during login.");
+            }
         }
 
-        // Resend Email Confirmation endpoint
-        // [HttpPost("resend-confirmation")]
-        // public async Task<IActionResult> ResendConfirmation([FromBody] ResendEmailConfirmationDto model)
-        // {
-        //     var user = await _userManager.FindByEmailAsync(model.Email);
-        //     if (user == null || await _userManager.IsEmailConfirmedAsync(user))
-        //     {
-        //         return BadRequest("Invalid request or email already confirmed.");
-        //     }
+        // Forgot Password Endpoint
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-        //     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        //     var confirmationUrl = Url.Action(nameof(EmailVerification), "Authentication", new { email = user.Email, code = code }, protocol: HttpContext.Request.Scheme);
+            try
+            {
+                var resetResponse = await _authService.ForgotPasswordAsync(forgotPasswordDto.Email);
+                // You might want to send an email to the user here (using _emailService) 
+                // with a link containing the resetResponse.Token.
+                // Make sure this link points to your frontend password reset page.
+                return Ok(resetResponse);
+            }
+            catch (NotFoundExe ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Forgot password error: {ex.Message}");
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
+        }
 
-        //     await _emailSender.SendEmailAsync(user.Email, "Resend Confirmation",
-        //         $"Please confirm your email by clicking this link: <a href='{confirmationUrl}'>Confirm Email</a>");
+        // Reset Password Endpoint
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto resetPasswordDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-        //     return Ok(new { message = $"A new confirmation email has been sent to {user.Email}." });
-        // }
+            try
+            {
+                bool success = await _authService.ResetPasswordAsync(resetPasswordDto);
+                if (success)
+                {
+                    return Ok("Password reset successfully!");
+                }
+                else
+                {
+                    // This shouldn't happen if ResetPasswordAsync is implemented correctly,
+                    // but it's good practice to handle it.
+                    return StatusCode(500, "An error occurred during password reset.");
+                }
+            }
+            catch (BadRequestException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Reset password error: {ex.Message}");
+                return StatusCode(500, "An error occurred during password reset.");
+            }
+        }
+
+        // ... other endpoints you need ... 
     }
 }

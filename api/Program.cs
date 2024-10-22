@@ -18,6 +18,7 @@ using api.Service;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using api.Dto.EmailDto;
+using api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,25 +27,23 @@ var builder = WebApplication.CreateBuilder(args);
 // ========================
 
 // Add Identity services with custom configuration (UserManager and RoleManager)
-builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
-{
-    options.SignIn.RequireConfirmedAccount = false;
-    options.SignIn.RequireConfirmedEmail = true;
-    options.Lockout.AllowedForNewUsers = true;
-    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(4);
-    options.Lockout.MaxFailedAccessAttempts = 5;
-    // Configure password policy
-    options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequireNonAlphanumeric = true;
-    options.Password.RequiredLength = 12;
-    // Email confirmation
-    options.Tokens.EmailConfirmationTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
-})
-.AddEntityFrameworkStores<ApplicationDBContext>()  // Use EF Core for Identity
-.AddDefaultTokenProviders(); // Token provider for password reset, etc.
+// builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
+// {
+//     options.SignIn.RequireConfirmedAccount = false; // Set to true if you want to require confirmed accounts
+//     options.SignIn.RequireConfirmedEmail = true; // This is correct for requiring email confirmation
+//     options.Lockout.AllowedForNewUsers = true;
+//     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(4);
+//     options.Lockout.MaxFailedAccessAttempts = 5;
 
+//     // Configure password policy
+//     options.Password.RequireDigit = true;
+//     options.Password.RequireLowercase = true;
+//     options.Password.RequireUppercase = true;
+//     options.Password.RequireNonAlphanumeric = true;
+//     options.Password.RequiredLength = 12;
+// })
+//.AddEntityFrameworkStores<ApplicationDBContext>() // Ensure this matches your DbContext
+//.AddDefaultTokenProviders(); // This includes the default token providers for password reset, email confirmation, etc.
 // Add Authentication (JWT Bearer)
 builder.Services.AddAuthentication(options =>
 {
@@ -121,7 +120,8 @@ builder.Services.AddScoped<IAuctionRepository, AuctionRepository>();
 builder.Services.AddScoped<IAuctionLotRepository, AuctionLotRepository>();
 builder.Services.AddScoped<ItockenService, TokenService>();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
-builder.Services.AddScoped<IEmailRepository, EmailSender>();
+builder.Services.AddScoped<IEmailRepository, EmailService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 
 // Register custom global exception handlers

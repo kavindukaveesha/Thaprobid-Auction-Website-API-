@@ -9,7 +9,7 @@ using Models;
 
 namespace api.data
 {
-    public class ApplicationDBContext : IdentityDbContext<AppUser>
+    public class ApplicationDBContext : DbContext
     {
         public ApplicationDBContext(DbContextOptions<ApplicationDBContext> dbContextOptions)
             : base(dbContextOptions)
@@ -21,27 +21,9 @@ namespace api.data
         public DbSet<SubCategory> SubCategories { get; set; }
         public DbSet<Auction> Auctions { get; set; }
         public DbSet<AuctionLotItem> AuctionLotItems { get; set; }
+        public DbSet<AppUser> AppUsers { get; set; }
+        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            base.OnModelCreating(builder);
 
-            // Seed initial roles
-            List<IdentityRole> roles = new List<IdentityRole>
-            {
-                new IdentityRole
-                {
-                    Name = "Admin",
-                    NormalizedName = "ADMIN"
-                },
-                new IdentityRole
-                {
-                    Name = "User",
-                    NormalizedName = "USER"
-                }
-            };
-
-            builder.Entity<IdentityRole>().HasData(roles);
-        }
     }
 }
