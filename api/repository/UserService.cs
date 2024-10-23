@@ -5,6 +5,7 @@ using api.Handlers;
 using api.Interfaces;
 using api.Models;
 using api.Models.security;
+using api.repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System;
@@ -20,21 +21,23 @@ namespace api.Services
         private readonly ItockenService _tokenService;
         private readonly IEmailRepository _emailService;
         private readonly IOptions<EmailSettings> _emailSettings;
+        private readonly MobileVerificationService _mobileVerification;
 
         public UserService(ApplicationDBContext context,
                            ItockenService tokenService,
                            IEmailRepository emailService,
-                           IOptions<EmailSettings> emailSettings)
+                           IOptions<EmailSettings> emailSettings, MobileVerificationService mobileVerification)
         {
             _context = context;
             _tokenService = tokenService;
             _emailService = emailService;
             _emailSettings = emailSettings;
+            _mobileVerification = mobileVerification;
         }
 
         #region User Management
 
-        public async Task<AppUser> CreateAppUserAsync(UserRegistrationRequestDto appUserDto)
+        public async Task<AppUser> CreateAppUserAsync(UserRegistrationRequestDto appUserDto, string role)
         {
             if (appUserDto == null)
             {
@@ -57,7 +60,10 @@ namespace api.Services
                 PasswordSalt = passwordSalt,
                 ConfirmedEmail = false,
                 ConfirmedMobile = false,
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTime.Now,
+                IsActive = true,
+                Role = role
+
             };
 
             _context.AppUsers.Add(newUser);
@@ -132,9 +138,12 @@ namespace api.Services
 
             return new AuthResponseDto
             {
+
+                User = user,
                 UserId = user.Id,
                 Token = token,
                 Email = user.Email
+
             };
         }
 
@@ -146,29 +155,37 @@ namespace api.Services
 
         public async Task<bool> ConfirmEmailAsync(string appUserId, string token)
         {
-            // 1. Validate the token (check if it's expired, valid format, etc.)
-            // ... (Add your token validation logic here)
-
-            // 2. Retrieve the user from the database using appUserId
-            var user = await _context.AppUsers.FindAsync(appUserId);
+            // Retrieve the user by their ID
+            var user = await _context.AppUsers
+                .FirstOrDefaultAsync(u => u.Id.ToString() == appUserId);
 
             if (user == null)
             {
-                throw new NotFoundExe("User not found.");
+                // User not found
+                throw new InvalidOperationException("User  not found.");
             }
 
-            // 3. Check if the email is already confirmed
+            // Validate the token
+            var isTokenValid = _tokenService.ValidateToken(token);
+
+            if (!isTokenValid)
+            {
+                // Invalid token
+                throw new InvalidOperationException("Invalid email confirmation token.");
+            }
+
             if (user.ConfirmedEmail)
             {
-                return true;
+                return true; // Already confirmed
             }
 
-            // 4. Mark the user's email as confirmed
+            // Confirm the user's email
             user.ConfirmedEmail = true;
             await _context.SaveChangesAsync();
 
             return true;
         }
+
 
         public async Task SendConfirmationEmailAsync(AppUser user)
         {
@@ -177,7 +194,7 @@ namespace api.Services
             // In a real-world scenario, you'd likely store this token temporarily in the 
             // database and associate it with the user for later validation.
 
-            var confirmationLink = $"/verification/confirm-email?userId={user.Id}&token={token}";
+            var confirmationLink = $"http://localhost:5173/verification?userId={user.Id}&token={token}";
 
             var emailDto = new EmailConfigDto
             {
@@ -240,6 +257,62 @@ namespace api.Services
             await _context.SaveChangesAsync();
             return true;
         }
+
+        //mobile number verification
+        public async Task<bool> ConfirmMobileNumberAsync(string appUserId, string otp)
+        {
+            // Retrieve the user by their ID
+            var user = await _context.AppUsers
+                .FirstOrDefaultAsync(u => u.Id.ToString() == appUserId);
+
+            if (user == null)
+            {
+                // User not found
+                throw new InvalidOperationException("User  not found.");
+            }
+
+            // Verify the OTP
+            bool isOtpVerified = _mobileVerification.VerifyOtp(user.MobileNumber, otp);
+
+            if (!isOtpVerified)
+            {
+                // Invalid OTP
+                throw new InvalidOperationException("Invalid OTP.");
+            }
+
+            if (user.ConfirmedMobile)
+            {
+                return true; // Already confirmed
+            }
+
+            // Confirm the user's mobile number
+            user.ConfirmedMobile = true;
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         private string GeneratePasswordResetToken()
         {

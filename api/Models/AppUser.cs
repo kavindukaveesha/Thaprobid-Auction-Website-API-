@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using api.Models.security;
 using Microsoft.AspNetCore.Identity;
@@ -26,6 +27,16 @@ namespace api.Models
 
 
         public PasswordResetToken? PasswordResetToken { get; set; }
+        public string Role { get; set; }
+
+        public bool IsActive { get; set; }
+        [JsonIgnore]
+        public ClientProfile ClientProfile { get; set; }
+
+        public Seller Seller { get; set; }
+
+
+
 
 
 

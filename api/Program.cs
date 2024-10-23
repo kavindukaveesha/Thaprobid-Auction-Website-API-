@@ -19,6 +19,7 @@ using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using api.Dto.EmailDto;
 using api.Services;
+using Newtonsoft.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -71,7 +72,10 @@ builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
     {
         options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+        options.SerializerSettings.Formatting = Formatting.Indented;
     });
+
+
 
 // Add DbContext for EF Core with SQL Server configuration
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
@@ -122,6 +126,9 @@ builder.Services.AddScoped<ItockenService, TokenService>();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddScoped<IEmailRepository, EmailService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+builder.Services.AddScoped<ISellerRepository, SellerRepository>();
+builder.Services.AddSingleton<MobileVerificationService>();
 
 
 // Register custom global exception handlers
@@ -133,11 +140,12 @@ builder.Services.AddSingleton<NotFoundExceptionHandler>();
 builder.Services.AddProblemDetails();
 
 // Add CORS policy (allowing all origins for now, can be customized)
+// Add CORS policy (allow specific origin)
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", builder =>
+    options.AddPolicy("AllowFrontend", builder =>
     {
-        builder.AllowAnyOrigin()
+        builder.WithOrigins("http://localhost:5173")
                .AllowAnyMethod()
                .AllowAnyHeader();
     });
@@ -162,8 +170,7 @@ else
 
 app.UseHttpsRedirection();  // Ensure HTTPS redirection
 app.UseRouting();           // Enable routing
-app.UseCors("AllowAll");     // Use CORS policy
-
+app.UseCors("AllowFrontend");  // Use CORS policy
 app.UseAuthentication();     // Enable authentication
 app.UseAuthorization();      // Enable authorization
 

@@ -9,7 +9,7 @@ namespace api.Interfaces
         #region User Management
 
         Task<AppUser> GetAppUserByIdAsync(int id);
-        Task<AppUser> CreateAppUserAsync(UserRegistrationRequestDto appUserDto);
+        Task<AppUser> CreateAppUserAsync(UserRegistrationRequestDto appUserDto, String role);
         Task<AppUser> UpdateAppUserAsync(int id, AppUser appUser);
         Task<bool> DeleteAppUserAsync(int id);
         Task<AppUser> GetAppUserByEmailAsync(string email);
@@ -35,5 +35,9 @@ namespace api.Interfaces
         Task<bool> ResetPasswordAsync(ResetPasswordRequestDto resetPasswordDto);
 
         #endregion
+        Task<bool> ConfirmMobileNumberAsync(string appUserId, string otp);
+
+
+
     }
 }

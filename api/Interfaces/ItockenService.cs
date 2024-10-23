@@ -9,5 +9,6 @@ namespace api.Interfaces
     public interface ItockenService
     {
         string CreateToken(AppUser user);
+        bool ValidateToken(string token);
     }
 }
