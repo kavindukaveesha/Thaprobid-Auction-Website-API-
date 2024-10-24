@@ -1,89 +1,103 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using api.data;
-using api.dto.response;
 using api.Dto.Auction;
-using api.Interfaces;
-using api.Mappers;
+using api.Models;
 using Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace api.Controller.Client
+namespace api.Controllers
 {
+    [Route("api/auction")]
     [ApiController]
-    [Route("api/seller/auction")]
-    public class ClientAuctionManagement : ControllerBase
+    public class AuctionController : ControllerBase
     {
-        private readonly IAuctionRepository _auctionRepo;
-        private readonly IAuctionLotRepository _auctionLot;
-        private readonly IFieldRepository _FieldRepo;
-        public ClientAuctionManagement(IAuctionRepository auctionRepo, IAuctionLotRepository auctionLot, IFieldRepository FieldRepo)
+        private readonly IAuctionRepository _auctionRepository;
+
+        public AuctionController(IAuctionRepository auctionRepository)
         {
-            _auctionRepo = auctionRepo;
-            _auctionLot = auctionLot;
-            _FieldRepo = FieldRepo;
+            _auctionRepository = auctionRepository;
         }
 
-        //create new auction
-        [HttpPost("{sellerId:int}")]
-        public async Task<IActionResult> createNewAuction([FromRoute] int sellerId, [FromBody] CreateAuctionDto createAuctionDto)
+        // POST: api/auction/create
+        [HttpPost("create")]
+        public async Task<IActionResult> CreateAuction([FromBody] CreateAuctionDto createAuctionDto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            //check  seller id is exist or not
-            var auctionModel = createAuctionDto.ToAuctionDetailsFromCreate(sellerId);
-            await _auctionRepo.CreateNewAuctionasync(auctionModel);
-            return Ok();
 
-
-
+            try
+            {
+                var auction = await _auctionRepository.CreateAuctionAsync(createAuctionDto);
+                return CreatedAtAction(nameof(GetAuctionById), new { auctionId = auction.AuctionID }, auction);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
-
-        [HttpPost("add-items/{sellerId:int}/{auctionId:int}")]
-        public async Task<IActionResult> AddNewItemLot([FromRoute] int sellerId, [FromRoute] int auctionId, [FromBody] AuctionItemLotCreateDto auctionItemLotCreateDto)
+        // GET: api/auction/seller/{sellerId}
+        [HttpGet("seller/{sellerId}")]
+        public async Task<IActionResult> GetAuctionsBySellerId(int sellerId)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                var auctions = await _auctionRepository.GetAuctionsBySellerIdAsync(sellerId);
+                return Ok(auctions);
             }
-            //check auction available or not
-            if (!await _auctionRepo.IsAuctionExist(auctionId))
+            catch (KeyNotFoundException ex)
             {
-                return NotFound(new ApiErrorDto(404, "NOT_FOUND", $"No Auction found with ID: {auctionId}"));
-
+                return NotFound(ex.Message);
             }
-            if (!await _FieldRepo.IsFieldExist(auctionItemLotCreateDto.FieldId))
+            catch (Exception ex)
             {
-                return NotFound(new ApiErrorDto(404, "NOT_FOUND", $"No Field found with ID: {auctionItemLotCreateDto.FieldId}"));
+                return StatusCode(500, ex.Message);
             }
-
-            var auction = await _auctionRepo.FindAuctionBYId(auctionId);
-            var existSellerId = auction.SellerId;
-
-            if (sellerId != existSellerId)
-            {
-                return BadRequest(new ApiErrorDto(400, "BAD_REQUEST", "Seller ID does not match the auction's seller."));
-            }
-
-
-
-            //check  seller id is exist or not
-
-
-            var lotItemModel = auctionItemLotCreateDto.ToAuctionLotItemFromCreateDto(auctionId);
-            await _auctionLot.AddnewLotItemAsync(lotItemModel);
-            return Ok();
-
-
-
         }
 
+        // GET: api/auction/{auctionId}
+        [HttpGet("{auctionId}")]
+        public async Task<IActionResult> GetAuctionById(int auctionId)
+        {
+            try
+            {
+                var auction = await _auctionRepository.GetAuctionByIdAsync(auctionId);
+                return Ok(auction);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        [HttpPost("start-auction/{auctionId}")]
+        public async Task<IActionResult> StartAuctionAutomatically(int auctionId)
+        {
+            var auction = await _auctionRepository.GetAuctionByIdAsync(auctionId);
+            if (auction == null)
+            {
+                return NotFound("Auction not found.");
+            }
 
+            if (auction.BiddingStartDate <= DateTime.UtcNow && !auction.IsActive)
+            {
+                // Update the auction to be active
+                await _auctionRepository.UpdateIsActiveAsync(auctionId, true);
+
+                return Ok($"Auction with ID {auctionId} is now live.");
+            }
+
+            return BadRequest("Auction cannot be started at this time.");
+        }
 
     }
 }

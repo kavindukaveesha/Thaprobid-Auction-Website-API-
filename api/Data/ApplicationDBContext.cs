@@ -26,6 +26,7 @@ namespace api.data
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
         public DbSet<ClientProfile> ClientProfiles { get; set; }
         public DbSet<Seller> Sellers { get; set; }
+        public DbSet<ItemBidded> ItemBiddeds { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // ... other configurations ...

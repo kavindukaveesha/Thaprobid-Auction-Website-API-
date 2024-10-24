@@ -64,6 +64,7 @@ namespace api.Dto.Auction
         public string TermsAndConditions { get; set; } = String.Empty;
 
         public string ImportantInformation { get; set; } = String.Empty;
+        public int SellerId { get; set; }
 
     }
 }

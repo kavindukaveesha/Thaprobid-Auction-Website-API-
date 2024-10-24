@@ -8,11 +8,13 @@ namespace api.Interfaces
 {
     public interface IAuctionLotRepository
     {
-        Task<List<Category>> GetAllLotItemsAsync();
-        Task<AuctionLotItem?> AddnewLotItemAsync(AuctionLotItem auctionLotItemModel);
-        Task<Category?> GetLotItemByIdAsync(int id);
-        //  Task<Category?> UpdateLotItemAsync(int id, UpdateCategoryDto categoryDto);
-        Task<Category?> DeleteLotItemAsync(int id);
+        Task<AuctionLotItem> AddLotItemAsync(AuctionLotItem lotItem);
+        Task<AuctionLotItem> GetLotItemByIdAsync(int lotItemId);
+        Task<IEnumerable<AuctionLotItem>> GetLotItemsByAuctionIdAsync(int auctionId);
+        Task<AuctionLotItem> UpdateLotItemAsync(AuctionLotItem lotItem);
+        Task<bool> DeleteLotItemAsync(int lotItemId);
+        Task<bool> DeleteAllLotItemsByAuctionIdAsync(int auctionId);
+        Task<bool> AuctionItemExistsAsync(int auctionId, int itemId);
 
     }
 }

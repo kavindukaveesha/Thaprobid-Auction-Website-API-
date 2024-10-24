@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using api.Dto.EmailDto;
 using api.Services;
 using Newtonsoft.Json;
+using api.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -121,13 +122,14 @@ builder.Services.AddScoped<IFieldRepository, FieldRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ISubCategoryRepository, SubCategoryRepository>();
 builder.Services.AddScoped<IAuctionRepository, AuctionRepository>();
-builder.Services.AddScoped<IAuctionLotRepository, AuctionLotRepository>();
+builder.Services.AddScoped<IAuctionLotRepository, AuctionLotItemRepository>();
 builder.Services.AddScoped<ItockenService, TokenService>();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddScoped<IEmailRepository, EmailService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 builder.Services.AddScoped<ISellerRepository, SellerRepository>();
+builder.Services.AddScoped<IItemBidderRepository, ItemBiddedRepository>();
 builder.Services.AddSingleton<MobileVerificationService>();
 
 

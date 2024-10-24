@@ -1,62 +1,52 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace api.Models
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
-
     public class AuctionLotItem
     {
-
         public int AuctionLotItemId { get; set; }
 
-
+        [Required]
         public int AuctionId { get; set; }
 
+
         public int FieldId { get; set; }
+
         public int CategoryId { get; set; }
+
         public int SubCategoryId { get; set; }
 
-        public string LotName { get; set; } = String.Empty;
-        public string LotDescription { get; set; } = String.Empty;
+        [Required, MaxLength(100)]
+        public string LotName { get; set; } = string.Empty;
 
-        public string LotImageUrl { get; set; } = String.Empty;
+        [MaxLength(500)]
+        public string LotDescription { get; set; } = string.Empty;
+
+        public string LotImageUrl { get; set; } = string.Empty;
 
         public string LotCondition { get; set; } // E.g., "New", "Used - Like New", "Used - Good", etc.
 
-
         public decimal EstimateBidStartPrice { get; set; }
+
         public decimal EstimateBidEndPrice { get; set; }
 
-
         public decimal AdditionalFees { get; set; }
-
 
         public decimal ShippingCost { get; set; }
 
         public int BidInterval { get; set; }
 
-
-        public bool IsSold { get; set; } = false; // Flag to indicate if the lot has been sold
+        public bool IsSold { get; set; } = false;
 
         public int? WinningBidderId { get; set; }
+        public bool IsBiddingActive { get; set; }
 
-        // Navigation Property for Bidders (Many-to-Many Relationship)
-        //public virtual ICollection<ItemBidder> ItemBidders { get; set; } = new List<ItemBidder>(); 
+        // Add timestamps for better auditing
+        // public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        // public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-        // ---- Additional Attributes to Consider ----
-
-
-
-
-
-
-
-        // public virtual ItemBidder WinningBidder { get; set; }
+        // You can add more relationships if necessary
     }
 }

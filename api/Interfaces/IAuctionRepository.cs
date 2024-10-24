@@ -1,15 +1,20 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using api.Dto.Auction;
 using api.Models;
+using Models;
 
-namespace api.Interfaces
+namespace Interfaces
 {
     public interface IAuctionRepository
     {
-        Task<Auction> CreateNewAuctionasync(Auction auctionModel);
-        Task<bool> IsAuctionExist(int id);
-        Task<Auction> FindAuctionBYId(int id);
+        Task<Auction> CreateAuctionAsync(CreateAuctionDto auctionDto);
+        Task<List<Auction>> GetAllAuctionsAsync();
+        Task<Auction> GetAuctionByIdAsync(int auctionId);
+        Task<List<Auction>> GetAuctionsBySellerIdAsync(int sellerId);
+        Task<bool> IsAuctionExistsAsync(int auctionId);
+        Task<bool> SellerExistsAsync(int sellerId);
+        Task<bool> IsAuctionActiveAsync(int auctionId);
+        Task UpdateIsActiveAsync(int auctionId, bool isActive);
     }
 }
