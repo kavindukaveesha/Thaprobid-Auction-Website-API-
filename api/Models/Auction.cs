@@ -18,7 +18,6 @@ namespace api.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int AuctionID { get; set; }
 
-        public String AuctionRegisterId { get; set; }
 
         public string AuctionName { get; set; } = String.Empty;
 

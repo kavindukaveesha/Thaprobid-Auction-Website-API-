@@ -9,9 +9,7 @@ namespace api.Dto.Auction
 {
     public class CreateAuctionDto
     {
-        [Required(ErrorMessage = "Auction Register ID is required.")]
 
-        public String AuctionRegisterId { get; set; }
 
         [Required(ErrorMessage = "Auction Name is required.")]
         [StringLength(100, ErrorMessage = "Auction Name cannot exceed 100 characters.")]

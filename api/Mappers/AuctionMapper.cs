@@ -13,7 +13,6 @@ namespace api.Mappers
         {
             return new Auction
             {
-                AuctionRegisterId = createAuctionDto.AuctionRegisterId,
                 AuctionName = createAuctionDto.AuctionName,
                 AuctionTitle = createAuctionDto.AuctionTitle,
                 AuctionDescription = createAuctionDto.AuctionDescription,
