@@ -74,7 +74,9 @@ namespace api.repository
         {
             try
             {
-                return await _context.Auctions.ToListAsync();
+                return await _context.Auctions
+                .Include(i => i.Items)
+                .ToListAsync();
             }
             catch (Exception ex)
             {
@@ -107,7 +109,8 @@ namespace api.repository
                            (a.AuctionLiveDate == sriLankaCurrentTime.Date && a.LiveAuctionTime.TimeOfDay > sriLankaCurrentTime.TimeOfDay)) // Only future live auctions
                 .OrderBy(a => a.AuctionLiveDate)
                 .ThenBy(a => a.LiveAuctionTime)
-                .Take(6) // Get the nearest 6 upcoming auctions
+                .Take(6)
+                 .Include(i => i.Items)
                 .ToListAsync(); // Perform asynchronous list retrieval
 
             // Convert UTC to Sri Lanka Time for display purposes
@@ -133,6 +136,7 @@ namespace api.repository
                 .OrderBy(a => a.AuctionLiveDate)
                 .ThenBy(a => a.LiveAuctionTime)
                 .Take(10) // Get the first 10 live auctions
+                 .Include(i => i.Items)
                 .ToListAsync(); // Perform asynchronous list retrieval
 
             // Convert UTC to Sri Lanka Time for display purposes

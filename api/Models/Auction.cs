@@ -56,6 +56,10 @@ namespace api.Models
         // Foreign Key for Seller (1:M relationship)
         public int SellerId { get; set; }
 
+        //auction ite list
+        public List<AuctionLotItem> Items { get; set; } = new List<AuctionLotItem>();
+
+
 
 
 
