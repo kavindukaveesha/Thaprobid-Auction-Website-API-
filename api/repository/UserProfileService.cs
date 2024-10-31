@@ -124,6 +124,7 @@ namespace api.repository
             }
 
             profile.UserId = userId;
+            profile.IsClientBidder = true;
             await _context.ClientProfiles.AddAsync(profile);
             await _context.SaveChangesAsync();
         }
