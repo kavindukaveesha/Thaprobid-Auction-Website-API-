@@ -1,32 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "D:\\SOFTWERE ENGENEERING\\My-Projects\\sa_project\\api\\api.csproj": {}
+    "/Users/kavindu/Developer/Projects/Thaprobid-Auction-Website-API-/api/api.csproj": {}
   },
   "projects": {
-    "D:\\SOFTWERE ENGENEERING\\My-Projects\\sa_project\\api\\api.csproj": {
+    "/Users/kavindu/Developer/Projects/Thaprobid-Auction-Website-API-/api/api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\SOFTWERE ENGENEERING\\My-Projects\\sa_project\\api\\api.csproj",
+        "projectUniqueName": "/Users/kavindu/Developer/Projects/Thaprobid-Auction-Website-API-/api/api.csproj",
         "projectName": "api",
-        "projectPath": "D:\\SOFTWERE ENGENEERING\\My-Projects\\sa_project\\api\\api.csproj",
-        "packagesPath": "C:\\Users\\Kavindu Kaveesha\\.nuget\\packages\\",
-        "outputPath": "D:\\SOFTWERE ENGENEERING\\My-Projects\\sa_project\\api\\obj\\",
+        "projectPath": "/Users/kavindu/Developer/Projects/Thaprobid-Auction-Website-API-/api/api.csproj",
+        "packagesPath": "/Users/kavindu/.nuget/packages/",
+        "outputPath": "/Users/kavindu/Developer/Projects/Thaprobid-Auction-Website-API-/api/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "E:\\Visual Studio\\SDK\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Kavindu Kaveesha\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/kavindu/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -118,7 +111,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.303/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.403/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
