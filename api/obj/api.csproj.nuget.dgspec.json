@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/kavindu/Developer/Projects/Thaprobid-Auction-Website-API-/api/api.csproj": {}
+    "/Users/kavindu/Developer/Software Enginner/Projects/Next-Era-Solutions/Thaprobid-Auction-Website-API-/api/api.csproj": {}
   },
   "projects": {
-    "/Users/kavindu/Developer/Projects/Thaprobid-Auction-Website-API-/api/api.csproj": {
+    "/Users/kavindu/Developer/Software Enginner/Projects/Next-Era-Solutions/Thaprobid-Auction-Website-API-/api/api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/kavindu/Developer/Projects/Thaprobid-Auction-Website-API-/api/api.csproj",
+        "projectUniqueName": "/Users/kavindu/Developer/Software Enginner/Projects/Next-Era-Solutions/Thaprobid-Auction-Website-API-/api/api.csproj",
         "projectName": "api",
-        "projectPath": "/Users/kavindu/Developer/Projects/Thaprobid-Auction-Website-API-/api/api.csproj",
+        "projectPath": "/Users/kavindu/Developer/Software Enginner/Projects/Next-Era-Solutions/Thaprobid-Auction-Website-API-/api/api.csproj",
         "packagesPath": "/Users/kavindu/.nuget/packages/",
-        "outputPath": "/Users/kavindu/Developer/Projects/Thaprobid-Auction-Website-API-/api/obj/",
+        "outputPath": "/Users/kavindu/Developer/Software Enginner/Projects/Next-Era-Solutions/Thaprobid-Auction-Website-API-/api/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/kavindu/.nuget/NuGet/NuGet.Config"
@@ -83,6 +83,10 @@
               "target": "Package",
               "version": "[8.0.0, )"
             },
+            "Pomelo.EntityFrameworkCore.MySql": {
+              "target": "Package",
+              "version": "[8.0.2, )"
+            },
             "RestSharp": {
               "target": "Package",
               "version": "[112.1.0, )"
@@ -111,7 +115,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.403/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.411/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

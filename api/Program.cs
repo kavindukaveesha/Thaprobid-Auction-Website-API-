@@ -78,10 +78,14 @@ builder.Services.AddControllers()
 
 
 
-// Add DbContext for EF Core with SQL Server configuration
+// Add DbContext for EF Core with MySQL configuration
+var connectionString = Environment.GetEnvironmentVariable("DOCKER_ENV") == "true" 
+    ? builder.Configuration.GetConnectionString("DockerConnection")
+    : builder.Configuration.GetConnectionString("DefaultConnection");
+
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
 
 // Add Swagger for API documentation

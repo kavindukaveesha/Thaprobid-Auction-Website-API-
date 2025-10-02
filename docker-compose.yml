@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: thaprobid_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ThaprobidAdmin123!
+      MYSQL_DATABASE: thaprobidauction
+      MYSQL_USER: thaprobid_user
+      MYSQL_PASSWORD: ThaprobidUser123!
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    networks:
+      - thaprobid_network
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: thaprobid_api
+    restart: always
+    ports:
+      - "5246:8080"
+      - "5031:8081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:8080;http://+:8081
+      - DOCKER_ENV=true
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - thaprobid_network
+
+volumes:
+  mysql_data:
+
+networks:
+  thaprobid_network:
+    driver: bridge
