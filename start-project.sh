@@ -25,7 +25,7 @@ echo "✅ MySQL is ready!"
 # Create and run migrations
 echo "🔄 Creating database migrations..."
 cd api
-dotnet ef migrations add InitialMySQLMigration --force
+dotnet ef migrations add InitialMySQLMigration
 dotnet ef database update
 
 echo "📊 Database setup complete!"
