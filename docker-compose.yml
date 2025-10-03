@@ -29,11 +29,10 @@ services:
     container_name: thaprobid_api
     restart: always
     ports:
-      - "5246:8080"
       - "5031:8081"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:8080;http://+:8081
+      - ASPNETCORE_URLS=http://+:8081
       - DOCKER_ENV=true
     depends_on:
       mysql:
