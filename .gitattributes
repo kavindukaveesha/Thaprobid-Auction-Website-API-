@@ -1,2 +1,104 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Source code files - enforce LF line endings
+*.cs text eol=lf
+*.json text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.xml text eol=lf
+*.xaml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.sql text eol=lf
+
+# Configuration files
+*.config text eol=lf
+*.props text eol=lf
+*.targets text eol=lf
+*.resx text eol=lf
+*.settings text eol=lf
+appsettings*.json text eol=lf
+*.csproj text eol=lf
+*.sln text eol=lf
+
+# Shell scripts
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Docker files
+Dockerfile text eol=lf
+docker-compose*.yml text eol=lf
+.dockerignore text eol=lf
+
+# Git files
+.gitignore text eol=lf
+.gitattributes text eol=lf
+
+# Binary files - do not modify
+*.dll binary
+*.exe binary
+*.so binary
+*.dylib binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.rar binary
+*.7z binary
+
+# Images
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg binary
+*.webp binary
+
+# Fonts
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+
+# Documents
+*.pdf binary
+*.doc binary
+*.docx binary
+*.xls binary
+*.xlsx binary
+*.ppt binary
+*.pptx binary
+
+# Certificate files
+*.pfx binary
+*.p12 binary
+*.cer binary
+*.crt binary
+*.key binary
+
+# Exclude build artifacts from line ending normalization
+bin/ binary
+obj/ binary
+*.user binary
+*.suo binary
+*.cache binary
+
+# Visual Studio and development files
+*.vssscc binary
+*.vspscc binary
+*.scc binary
+
+# NuGet packages
+*.nupkg binary
+
+# Database files
+*.db binary
+*.sqlite binary
+*.mdf binary
+*.ldf binary
