@@ -1,0 +1,329 @@
+name: Branch Protection Enforcement
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run daily at 6 AM UTC to check protection status
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+jobs:
+  enforce-protection:
+    name: "Enforce Branch Protection"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Verify branch protection rules
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo "Checking branch protection status for main branch..."
+        
+        # Check if main branch protection exists
+        if gh api repos/${{ github.repository }}/branches/main/protection > /dev/null 2>&1; then
+          echo "✅ Branch protection is enabled for main branch"
+        else
+          echo "❌ Branch protection is NOT enabled for main branch"
+          echo "::error::Main branch protection is missing"
+          exit 1
+        fi
+        
+        # Get current protection settings
+        protection_status=$(gh api repos/${{ github.repository }}/branches/main/protection --jq '{
+          "required_status_checks": .required_status_checks.strict,
+          "required_pull_request_reviews": .required_pull_request_reviews.required_approving_review_count,
+          "enforce_admins": .enforce_admins.enabled,
+          "allow_force_pushes": .allow_force_pushes.enabled,
+          "allow_deletions": .allow_deletions.enabled
+        }')
+        
+        echo "📊 Current protection settings:"
+        echo "$protection_status"
+        
+        # Verify specific protection rules
+        required_checks=$(gh api repos/${{ github.repository }}/branches/main/protection --jq '.required_status_checks.strict')
+        required_reviews=$(gh api repos/${{ github.repository }}/branches/main/protection --jq '.required_pull_request_reviews.required_approving_review_count')
+        enforce_admins=$(gh api repos/${{ github.repository }}/branches/main/protection --jq '.enforce_admins.enabled')
+        allow_force_pushes=$(gh api repos/${{ github.repository }}/branches/main/protection --jq '.allow_force_pushes.enabled')
+        allow_deletions=$(gh api repos/${{ github.repository }}/branches/main/protection --jq '.allow_deletions.enabled')
+        
+        # Validate protection rules
+        if [ "$required_checks" != "true" ]; then
+          echo "::warning::Required status checks are not enforced"
+        fi
+        
+        if [ "$required_reviews" -lt "1" ]; then
+          echo "::error::Minimum 1 review is required but currently set to $required_reviews"
+          exit 1
+        fi
+        
+        if [ "$enforce_admins" != "true" ]; then
+          echo "::warning::Admin enforcement is not enabled"
+        fi
+        
+        if [ "$allow_force_pushes" = "true" ]; then
+          echo "::error::Force pushes are allowed - this is a security risk"
+          exit 1
+        fi
+        
+        if [ "$allow_deletions" = "true" ]; then
+          echo "::error::Branch deletions are allowed - this is a security risk"
+          exit 1
+        fi
+        
+        echo "✅ Branch protection validation completed"
+
+  check-required-checks:
+    name: "Verify Required Status Checks"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Check required status checks configuration
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo "🔍 Checking required status checks for main branch..."
+        
+        # Get list of required status checks
+        required_contexts=$(gh api repos/${{ github.repository }}/branches/main/protection --jq '.required_status_checks.contexts[]' 2>/dev/null || echo "[]")
+        
+        echo "📋 Currently required status checks:"
+        if [ "$required_contexts" = "[]" ]; then
+          echo "⚠️ No required status checks configured"
+        else
+          echo "$required_contexts"
+        fi
+        
+        # Expected required checks
+        expected_checks=(
+          "CI/CD Pipeline / test"
+          "CI/CD Pipeline / security"
+          "Security Scan / dependency-scan"
+          "Security Scan / code-analysis"
+        )
+        
+        echo "🎯 Expected required checks:"
+        printf '%s\n' "${expected_checks[@]}"
+        
+        # Note: This is informational - actual enforcement happens via branch protection rules
+
+  validate-codeowners:
+    name: "Validate CODEOWNERS"
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Check CODEOWNERS file
+      run: |
+        echo "👥 Checking CODEOWNERS file..."
+        
+        if [ -f ".github/CODEOWNERS" ]; then
+          echo "✅ CODEOWNERS file exists"
+          
+          # Validate syntax
+          if grep -q "^[^#]" .github/CODEOWNERS; then
+            echo "✅ CODEOWNERS file has content"
+            
+            # Show file contents (first 10 lines)
+            echo "📋 CODEOWNERS rules (first 10 lines):"
+            head -10 .github/CODEOWNERS
+            
+            # Check for global owner
+            if grep -q "^\* @" .github/CODEOWNERS; then
+              echo "✅ Global code owner is configured"
+            else
+              echo "⚠️ No global code owner found"
+            fi
+            
+            # Check for security-sensitive files
+            if grep -q "appsettings" .github/CODEOWNERS; then
+              echo "✅ Security-sensitive files are protected"
+            else
+              echo "⚠️ Security-sensitive files may not be protected"
+            fi
+          else
+            echo "⚠️ CODEOWNERS file is empty or only contains comments"
+          fi
+        else
+          echo "⚠️ CODEOWNERS file does not exist"
+          echo "::warning::Consider creating a CODEOWNERS file for better code review governance"
+        fi
+
+  security-config-check:
+    name: "Security Configuration Check"
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Check for security configurations
+      run: |
+        echo "🔒 Checking security configurations..."
+        
+        # Check for security policy
+        if [ -f ".github/SECURITY.md" ]; then
+          echo "✅ Security policy exists"
+        else
+          echo "⚠️ No security policy found"
+        fi
+        
+        # Check for security issue templates
+        if [ -f ".github/ISSUE_TEMPLATE/security_issue.md" ]; then
+          echo "✅ Security issue template exists"
+        else
+          echo "⚠️ No security issue template found"
+        fi
+        
+        # Check for dependabot configuration
+        if [ -f ".github/dependabot.yml" ]; then
+          echo "✅ Dependabot configuration exists"
+        else
+          echo "⚠️ No dependabot configuration found"
+          echo "::warning::Consider adding dependabot.yml for automatic dependency updates"
+        fi
+        
+        # Check for security workflows
+        security_workflows=0
+        if [ -f ".github/workflows/security-scan.yml" ]; then
+          echo "✅ Security scan workflow exists"
+          ((security_workflows++))
+        fi
+        
+        if [ -f ".github/workflows/codeql.yml" ]; then
+          echo "✅ CodeQL workflow exists"
+          ((security_workflows++))
+        fi
+        
+        if [ $security_workflows -eq 0 ]; then
+          echo "⚠️ No security workflows found"
+          echo "::warning::Consider adding security scanning workflows"
+        fi
+
+  pr-security-check:
+    name: "PR Security Review"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Check for sensitive file changes
+      run: |
+        echo "🔍 Checking for changes to sensitive files..."
+        
+        # Get list of changed files
+        changed_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
+        
+        echo "📝 Changed files:"
+        echo "$changed_files"
+        
+        # Define sensitive file patterns
+        sensitive_patterns=(
+          "appsettings.*\.json"
+          "Program\.cs"
+          "Startup\.cs"
+          "\.env"
+          "secrets\.json"
+          "docker-compose.*\.yml"
+          "Dockerfile"
+          "\.github/workflows/"
+        )
+        
+        sensitive_changes=false
+        
+        for pattern in "${sensitive_patterns[@]}"; do
+          if echo "$changed_files" | grep -E "$pattern" > /dev/null; then
+            echo "⚠️ Sensitive file changed: Files matching pattern '$pattern'"
+            sensitive_changes=true
+          fi
+        done
+        
+        if [ "$sensitive_changes" = true ]; then
+          echo "::warning::This PR modifies sensitive files - ensure extra review"
+          echo "::notice::Sensitive file changes detected - requiring additional security review"
+        else
+          echo "✅ No sensitive file changes detected"
+        fi
+        
+    - name: Check for potential secrets
+      run: |
+        echo "🔐 Scanning for potential secrets in changed files..."
+        
+        # Simple secret patterns (basic check)
+        secret_patterns=(
+          "[Pp]assword.*=.*['\"][^'\"]{8,}['\"]"
+          "[Aa]pi[Kk]ey.*=.*['\"][^'\"]{16,}['\"]"
+          "[Tt]oken.*=.*['\"][^'\"]{16,}['\"]"
+          "[Ss]ecret.*=.*['\"][^'\"]{16,}['\"]"
+          "-----BEGIN.*PRIVATE KEY-----"
+        )
+        
+        secrets_found=false
+        
+        # Get changed file contents
+        git diff ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} > changes.diff
+        
+        for pattern in "${secret_patterns[@]}"; do
+          if grep -E "$pattern" changes.diff > /dev/null; then
+            echo "🚨 Potential secret pattern found: $pattern"
+            secrets_found=true
+          fi
+        done
+        
+        if [ "$secrets_found" = true ]; then
+          echo "::error::Potential secrets detected in PR changes"
+          echo "::notice::Please review the changes and ensure no secrets are committed"
+          exit 1
+        else
+          echo "✅ No obvious secret patterns detected"
+        fi
+
+  notify-protection-status:
+    name: "Notify Protection Status"
+    runs-on: ubuntu-latest
+    needs: [enforce-protection, check-required-checks, validate-codeowners, security-config-check]
+    if: always() && github.event_name == 'schedule'
+    
+    steps:
+    - name: Report status
+      run: |
+        echo "📊 Branch Protection Status Report"
+        echo "================================="
+        
+        if [ "${{ needs.enforce-protection.result }}" = "success" ]; then
+          echo "✅ Branch protection rules: COMPLIANT"
+        else
+          echo "❌ Branch protection rules: NON-COMPLIANT"
+        fi
+        
+        if [ "${{ needs.validate-codeowners.result }}" = "success" ]; then
+          echo "✅ CODEOWNERS configuration: OK"
+        else
+          echo "⚠️ CODEOWNERS configuration: NEEDS ATTENTION"
+        fi
+        
+        if [ "${{ needs.security-config-check.result }}" = "success" ]; then
+          echo "✅ Security configuration: OK"
+        else
+          echo "⚠️ Security configuration: NEEDS IMPROVEMENT"
+        fi
+        
+        echo "🔗 View detailed results in workflow logs"
+        echo "📅 Next check: $(date -d '+1 day' '+%Y-%m-%d %H:%M UTC')"

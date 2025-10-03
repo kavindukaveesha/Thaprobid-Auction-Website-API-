@@ -1,0 +1,116 @@
+name: 📚 Documentation Issue
+description: Report issues with documentation or request improvements
+title: "[DOCS] "
+labels: ["documentation", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Help us improve our documentation! Please provide details about what needs to be fixed or added.
+
+  - type: dropdown
+    id: doc-type
+    attributes:
+      label: Documentation Type
+      description: What type of documentation is this about?
+      options:
+        - API Documentation
+        - Setup/Installation Guide
+        - README
+        - Code Comments
+        - Architecture Documentation
+        - Security Documentation
+        - Troubleshooting Guide
+        - Contributing Guidelines
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: Issue Type
+      description: What kind of documentation issue is this?
+      options:
+        - Missing Information
+        - Incorrect Information
+        - Outdated Information
+        - Unclear Instructions
+        - Broken Links
+        - Formatting Issues
+        - New Documentation Request
+        - Translation Request
+    validations:
+      required: true
+
+  - type: textarea
+    id: location
+    attributes:
+      label: Documentation Location
+      description: Where is this documentation located?
+      placeholder: |
+        - File path: /docs/example.md
+        - URL: https://example.com/docs
+        - Section: "Getting Started"
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-content
+    attributes:
+      label: Current Content (if applicable)
+      description: What does the current documentation say?
+      placeholder: Quote the current text or describe what's there now...
+    validations:
+      required: false
+
+  - type: textarea
+    id: suggested-content
+    attributes:
+      label: Suggested Improvement
+      description: What should the documentation say instead?
+      placeholder: Provide the corrected or additional content...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: user-type
+    attributes:
+      label: Target Audience
+      description: Who would benefit from this documentation improvement?
+      options:
+        - New Developers
+        - Experienced Developers
+        - System Administrators
+        - End Users
+        - Contributors
+        - All Users
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Why is this documentation important?
+      placeholder: |
+        - What confusion did this cause?
+        - How did you figure out the correct information?
+        - What examples would be helpful?
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched for existing documentation issues
+          required: true
+        - label: I have provided specific suggestions for improvement
+          required: true
+        - label: I am willing to help write the documentation (optional)
+          required: false

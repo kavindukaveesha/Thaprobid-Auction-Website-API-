@@ -1,0 +1,119 @@
+name: 🔒 Security Vulnerability Report
+description: Report a security vulnerability (for non-critical issues only)
+title: "[SECURITY] "
+labels: ["security", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ⚠️ **IMPORTANT**: For critical security vulnerabilities, please do NOT create a public issue. 
+        Instead, contact us privately at: security@thaprobid.com
+
+        Use this template only for minor security improvements or non-critical security issues.
+
+  - type: checkboxes
+    id: severity-check
+    attributes:
+      label: Severity Confirmation
+      description: Please confirm this is NOT a critical security issue
+      options:
+        - label: This is NOT a critical security vulnerability that could be exploited
+          required: true
+        - label: This is a minor security improvement or configuration issue
+          required: true
+
+  - type: dropdown
+    id: security-type
+    attributes:
+      label: Security Issue Type
+      description: What type of security issue is this?
+      options:
+        - Configuration Improvement
+        - Documentation Security Gap
+        - Minor Authentication Issue
+        - Logging/Monitoring Enhancement
+        - Dependency Update
+        - Security Best Practice
+        - Other (Non-Critical)
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Issue Description
+      description: Describe the security concern
+      placeholder: Explain the security issue or improvement...
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Potential Impact
+      description: What could happen if this isn't addressed?
+      placeholder: Describe the potential security impact...
+    validations:
+      required: true
+
+  - type: textarea
+    id: recommendation
+    attributes:
+      label: Recommended Solution
+      description: How do you suggest fixing this?
+      placeholder: Suggest how to address this security concern...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: affected-component
+    attributes:
+      label: Affected Component
+      description: Which part of the system is affected?
+      options:
+        - Authentication System
+        - API Endpoints
+        - Database Configuration
+        - Docker Setup
+        - Dependencies
+        - Documentation
+        - Configuration Files
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce (if applicable)
+      description: How can this issue be demonstrated?
+      placeholder: |
+        1. Access '...'
+        2. Notice '...'
+        3. Security concern: '...'
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other relevant information
+      placeholder: Links to security best practices, similar issues, etc...
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: This is NOT a critical security vulnerability
+          required: true
+        - label: I have not included sensitive information in this report
+          required: true
+        - label: I understand critical vulnerabilities should be reported privately
+          required: true

@@ -1,0 +1,41 @@
+# CODEOWNERS for Thaprobid Auction Website API
+
+# Global code owners - all files require review from repository owner
+* @kavindukaveesha
+
+# API Core Files - Critical business logic
+/api/Controllers/ @kavindukaveesha
+/api/Models/ @kavindukaveesha
+/api/Services/ @kavindukaveesha
+/api/Repository/ @kavindukaveesha
+/api/Interfaces/ @kavindukaveesha
+
+# Security-sensitive files - Extra scrutiny required
+/api/Program.cs @kavindukaveesha
+/api/appsettings*.json @kavindukaveesha
+/api/Handlers/ @kavindukaveesha
+/api/Models/security/ @kavindukaveesha
+
+# Infrastructure and deployment
+/.github/ @kavindukaveesha
+/Dockerfile @kavindukaveesha
+/docker-compose.yml @kavindukaveesha
+/*.sh @kavindukaveesha
+
+# Database and data access
+/api/Data/ @kavindukaveesha
+/api/Models/ @kavindukaveesha
+/docker/mysql/ @kavindukaveesha
+
+# Configuration files
+*.json @kavindukaveesha
+*.yml @kavindukaveesha
+*.yaml @kavindukaveesha
+
+# Documentation
+*.md @kavindukaveesha
+/docs/ @kavindukaveesha
+
+# Project files
+*.csproj @kavindukaveesha
+*.sln @kavindukaveesha

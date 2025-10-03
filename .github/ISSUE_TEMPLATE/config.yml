@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🔒 Critical Security Vulnerability
+    url: mailto:security@thaprobid.com
+    about: Report critical security vulnerabilities privately via email
+  - name: 💬 General Discussion
+    url: https://github.com/Next-Era-Solutions/Thaprobid-Auction-Website-API-/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: 📧 Direct Support
+    url: mailto:support@thaprobid.com
+    about: Get direct support from the development team
